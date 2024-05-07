@@ -427,6 +427,7 @@ const ConvocatoriaNacional = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    //remove this promise
     fetchData().then(d => setData(d));
     try {
       const response = await fetch("/api/contrataciones", {
@@ -439,7 +440,7 @@ const ConvocatoriaNacional = () => {
 
       if (response.ok) {
         const result = await response.json();
-        setData(result.data);
+        //setData(result.data);
       } else {
         console.error('Error al obtener los datos');
       }

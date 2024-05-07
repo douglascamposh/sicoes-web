@@ -1,11 +1,12 @@
 import puppeteer from "puppeteer";
 
-function separeCuseId(id) {
+const parseCuseId = (id) => {
   const cuce = id.split("-");
   return cuce;
 }
 
-export default async function handler(req, res) {
+export default async (req, res) => {
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -27,20 +28,19 @@ export default async function handler(req, res) {
     const row = await page.$('.row');
     await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
     await page.waitForSelector('.cuce input[name="cuce1"]');
-// puedo mejorar la logica aqui
-    if (cuceID) {
-      let separaData = separeCuseId(cuceID);
-      if (separaData.length <= 1) {
-        await page.type('.cuce input[name="cuce4"]', separaData[0] || '');
-      } else {
-        await page.type('.cuce input[name="cuce1"]', separaData[0]);
-        await page.type('.cuce input[name="cuce2"]', separaData[1]);
-        await page.type('.cuce input[name="cuce3"]', separaData[2]);
-        await page.type('.cuce input[name="cuce4"]', separaData[3]);
-        await page.type('.cuce input[name="cuce5"]', separaData[4]);
-        await page.type('.cuce input[name="cuce6"]', separaData[5]);
+   // I can improve the logic here
+   if (cuceID) {
+    const separeData = parseCuseId(cuceID);
+    const CUCE_FIELD_NAMES = ['cuce1', 'cuce2', 'cuce3', 'cuce4', 'cuce5', 'cuce6'];
+  
+    if (separeData.length <= 1) {
+      await page.type('.cuce input[name="cuce4"]', separeData[0] || '');
+    } else {
+      for (let i = 0; i < Math.min(separeData.length, CUCE_FIELD_NAMES.length); i++) {
+        await page.type(`.cuce input[name="${CUCE_FIELD_NAMES[i]}"]`, separeData[i]);
       }
     }
+  }
     await page.click('.busquedaForm');
     await page.waitForSelector('#tablaSimple');
 
@@ -67,7 +67,6 @@ export default async function handler(req, res) {
       }
       return dataArray;
     });
-    console.log(data);
     await browser.close();
     return res.status(200).json({ message: "Success", data });
   } catch (error) {

@@ -7,6 +7,7 @@ const Table = ({ data, columns }) => {
     pageSize: 10,
   });
 
+
   const table = useReactTable({
     columns,
     data,
