@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
-import { useReactTable, getCoreRowModel, getSortedRowModel, getPaginationRowModel, flexRender } from '@tanstack/react-table';
+import Filter from './filterTable';
+import FirstPageSharpIcon from '@mui/icons-material/FirstPageSharp';
+import NavigateBeforeSharpIcon from '@mui/icons-material/NavigateBeforeSharp';
+import NavigateNextSharpIcon from '@mui/icons-material/NavigateNextSharp';
+import LastPageSharpIcon from '@mui/icons-material/LastPageSharp';
 
-const Table = ({ data, columns }) => {
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+import { useReactTable,
+         getCoreRowModel,
+         getSortedRowModel,
+         getPaginationRowModel,
+         flexRender,
+         getFilteredRowModel} from '@tanstack/react-table';
 
+const Table = ({ data, columns, handleNextPage, handlePrevPage,handleFirstPage, handleLastPage, page, totalPages, totalElements}) => {
+
+  const [columnFilters, setColumnFilters] = useState([]);
 
   const table = useReactTable({
     columns,
@@ -15,14 +23,15 @@ const Table = ({ data, columns }) => {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onPaginationChange: setPagination,
+    getFilteredRowModel : getFilteredRowModel(),
+    onColumnFiltersChange: setColumnFilters,
     state: {
-      pagination,
+      columnFilters,
     },
   });
 
   return (
-    <div className="p-4 bg-gray-100">
+    <div className="p-4 bg-gray-100 mt-4">
       <div className="h-4" />
       <table className="w-full bg-white border-collapse">
         <thead>
@@ -41,6 +50,11 @@ const Table = ({ data, columns }) => {
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.column.getCanFilter() && header.column.id === 'auction' ? (
+                     <div>
+                      <Filter column={header.column} />
+                     </div>
+                  ): null}
                 </th>
               ))}
             </tr>
@@ -68,38 +82,34 @@ const Table = ({ data, columns }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <button
-            className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
+            className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
+            onClick={handleFirstPage}
           >
-            {'<<'}
+            <FirstPageSharpIcon/>
           </button>
           <button
-            className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
+            onClick={handlePrevPage}
           >
-            {'<'}
+            <NavigateBeforeSharpIcon/>
           </button>
           <button
-            className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
+            onClick={handleNextPage}
           >
-            {'>'}
+           <NavigateNextSharpIcon/>
           </button>
           <button
-            className="bg-blue-700 text-white px-3 py-1 rounded hover:bg-blue-600 text-xs"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
+            className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
+            onClick={() => handleLastPage(totalPages-1)}
           >
-            {'>>'}
+            <LastPageSharpIcon/>
           </button>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-gray-700 text-xs">
-            Página {table.getState().pagination.pageIndex + 1} de{' '}
-            {table.getPageCount().toLocaleString()}
+            Página {page+1} de{' '}
+            {totalPages}
           </span>
           <span className="flex items-center gap-1 text-xs">
             | Ir a la página:
@@ -113,32 +123,20 @@ const Table = ({ data, columns }) => {
               className="border p-1 rounded w-16 text-xs"
             />
           </span>
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => {
-              table.setPageSize(Number(e.target.value));
-            }}
-            className="border p-1 rounded text-xs"
-          >
-            {[10, 20, 30, 40, 50].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                Mostrar {pageSize}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
       <div className="mt-4 flex flex-row justify-between">
         <span className="text-xs">
           Mostrando {table.getRowModel().rows.length.toLocaleString()} de{' '}
-          {table.getRowCount().toLocaleString()} filas
+          {totalElements} filas
         </span>
         <span className="text-xs">
-          {table.getRowCount().toLocaleString()} elementos encontrados
+          {totalElements} elementos encontrados
         </span>
       </div>
     </div>
   );
 };
+
 
 export default Table;
