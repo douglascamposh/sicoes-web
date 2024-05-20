@@ -28,7 +28,7 @@ export default async (req, res) => {
     const row = await page.$('.row');
     await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
     await page.waitForSelector('.cuce input[name="cuce1"]');
-   // I can improve the logic here
+    
    if (cuceID) {
     const separeData = parseCuseId(cuceID);
     const CUCE_FIELD_NAMES = ['cuce1', 'cuce2', 'cuce3', 'cuce4', 'cuce5', 'cuce6'];
@@ -51,27 +51,29 @@ export default async (req, res) => {
       for (const row of rows){
         const columns = row.querySelectorAll('td');
         const dataObject = {};
-        dataObject.Cuce = columns[0].innerText || '';
-        dataObject.Entidad = columns[1].innerText;
-        dataObject['Tipo Contratación'] = columns[2].innerText || '';
-        dataObject.Modalidad = columns[3].innerText || '';
-        dataObject['Objeto de Contratación'] = columns[4].innerText || '';
-        dataObject.Subasta = columns[5].innerText || '';
-        dataObject['Fecha Publicación'] = columns[6].innerText || '';
-        dataObject['Fecha Presentación'] = columns[7].innerText || '';
-        dataObject.Estado = columns[8].innerText || '';
-        dataObject.Archivos = columns[9].innerText || '';
-        dataObject.Formularios = columns[10].innerText || '';
-        dataObject.Reportes = columns[11].innerText|| '';
+        dataObject.cuce = columns[0].innerText || '';
+        dataObject.entity = columns[1].innerText;
+        dataObject.contract = columns[2].innerText || '';
+        dataObject.modality = columns[3].innerText || '';
+        dataObject.contractDescription = columns[4].innerText || '';
+        dataObject.auction = columns[5].innerText || false;
+        dataObject.stateAuction = columns[8].innerText || '';
+        dataObject.publishDateItem = columns[6].innerText || 0;
+        dataObject.presentationDate= columns[7].innerText || 0;
+        // dataObject.Archivos = columns[9].innerText || '';
+        // dataObject.Formularios = columns[10].innerText || '';
+        // dataObject.Reportes = columns[11].innerText|| '';
         dataArray.push(dataObject);
+
       }
+
       return dataArray;
     });
     await browser.close();
     return res.status(200).json({ message: "Success", data });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Hubo un problema" });
+    return res.status(500).json({ error: error });
   }
 }
 
