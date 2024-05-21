@@ -74,6 +74,6 @@ jobs:
       with:
         context: .
         platforms: linux/amd64
-        tags: douglascamposh/housefy-next
+        tags: douglascamposh/sicoesweb
         push: true
 
