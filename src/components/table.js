@@ -12,10 +12,9 @@ import { useReactTable,
          flexRender,
          getFilteredRowModel} from '@tanstack/react-table';
 
-const Table = ({ data, columns, handleNextPage, handlePrevPage,handleFirstPage, handleLastPage, page, totalPages, totalElements}) => {
+const Table = ({ data, columns, handleNextPage, handlePrevPage,handleFirstPage, handleLastPage, page, totalPages, totalElements, handleAnyPage}) => {
 
   const [columnFilters, setColumnFilters] = useState([]);
-
   const table = useReactTable({
     columns,
     data,
@@ -89,13 +88,16 @@ const Table = ({ data, columns, handleNextPage, handlePrevPage,handleFirstPage, 
           </button>
           <button
             className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
+            disabled = {page === 0}
             onClick={handlePrevPage}
           >
             <NavigateBeforeSharpIcon/>
           </button>
           <button
             className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
+            disabled = { page ===(totalPages -1)}
             onClick={handleNextPage}
+            
           >
            <NavigateNextSharpIcon/>
           </button>
@@ -115,12 +117,12 @@ const Table = ({ data, columns, handleNextPage, handlePrevPage,handleFirstPage, 
             | Ir a la página:
             <input
               type="number"
-              defaultValue={table.getState().pagination.pageIndex + 1}
-              onChange={(e) => {
-                const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                table.setPageIndex(page);
-              }}
+              defaultValue={1}
               className="border p-1 rounded w-16 text-xs"
+              onChange={(e) => {
+                const page = e.target.value? Number(e.target.value) - 1 : 0;
+                handleAnyPage(page);
+              }}
             />
           </span>
         </div>

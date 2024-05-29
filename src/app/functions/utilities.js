@@ -40,6 +40,7 @@ export const convertStringToBoolean = (dataString) => {
 export const transformData = (data) => {
   const adaptData = data.map((d) => {
             return {
+                id : d.id,
                 cuce: d.cuce || '',
                 entity: d.entity || '',
                 contract: d.contract || '',

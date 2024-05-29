@@ -21,10 +21,13 @@ const paginationSlice = createSlice({
         },
         searchCuce : (state, action) => {
             state.search = action.payload;
+        },
+        anyPage : (state,action) => {
+            state.page = action.payload;
         }
     }
 });
 
-export const {firsPage,nextPage,prevPage,lastPage,searchCuce} = paginationSlice.actions;
+export const {firsPage,nextPage,prevPage,lastPage,searchCuce,anyPage} = paginationSlice.actions;
 export default paginationSlice.reducer;
 

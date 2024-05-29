@@ -28,6 +28,7 @@ export default async (req, res) => {
     const row = await page.$('.row');
     await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
     await page.waitForSelector('.cuce input[name="cuce1"]');
+    await page.click('label:nth-child(2) div ins');
     
    if (cuceID) {
     const separeData = parseCuseId(cuceID);
@@ -41,12 +42,13 @@ export default async (req, res) => {
       }
     }
   }
+   
     await page.click('.busquedaForm');
     await page.waitForSelector('#tablaSimple');
 
     let data = await page.evaluate(() => {
       const table = document.querySelector('#tablaSimple');
-      const rows = table.querySelectorAll('tbody tr');
+      const rows = table ? table.querySelectorAll('tbody tr') : [];
       const dataArray = [];
       for (const row of rows){
         const columns = row.querySelectorAll('td');

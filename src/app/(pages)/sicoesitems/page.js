@@ -5,11 +5,13 @@ import FormNationalTender from "@/components/Form/formNationalTender";
 import ModalCuce from "@/components/modal";
 import FormNewItem from "@/components/Form/newItem";
 import SicoesData from "@/components/sicoesData";
-import { usePostItemMutation, useGetItemsQuery } from "@/redux/services/itemsApi";
+import { usePostItemMutation, useGetItemsQuery, useDeleteItemMutation} from "@/redux/services/itemsApi";
 import AddIcon from '@mui/icons-material/Add';
 import { transformData, newItemObject } from "@/app/functions/utilities";
 import { useDispatch, useSelector } from "react-redux";
-import { nextPage, prevPage, firsPage, lastPage, searchCuce } from "@/redux/slice/paginationSlice";
+import { nextPage, prevPage, firsPage, lastPage, searchCuce, anyPage } from "@/redux/slice/paginationSlice";
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 const SicoesItems = () => {
 
@@ -49,6 +51,22 @@ const SicoesItems = () => {
             accessorKey: 'stateAuction',
             header: 'Estado',
         },
+        {
+            accessorKey: 'deleteRow',
+            header: 'Eliminar',
+            cell: ({ row }) => (
+                <button
+                className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-2 rounded-md shadow-md transition duration-300 ease-in-out"
+                onClick={() => {
+                  if (window.confirm('¿Estás seguro de que quieres eliminar?')) {
+                    handleDeleteItems(row.original.id);
+                  }
+                }}
+              >
+                <DeleteIcon className="h-5 w-5" />
+              </button>
+            ),
+          }
     ];
 
 
@@ -76,8 +94,9 @@ const SicoesItems = () => {
     const [dataSicoes, setDataSicoes] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [postItem] = usePostItemMutation();
+    const [deleteItem] = useDeleteItemMutation();
 
-//add when we have limit
+    //add when we have limit
     const { data: itemsSicoesData, refetch: refetchItems } = useGetItemsQuery({
         page: page,
         search: search,
@@ -100,7 +119,6 @@ const SicoesItems = () => {
         refetchItems();
     };
 
-
     const handleFirstPage = () => {
         dispatch(firsPage());
         refetchItems();
@@ -115,6 +133,20 @@ const SicoesItems = () => {
         dispatch(searchCuce(values.cuceId))
         refetchItems();
     }
+
+    const handleAnyPage = async (page) => {
+        dispatch(anyPage(page));
+        refetchItems();
+    }
+    
+    const handleDeleteItems = async (id) => {
+      try {
+        await deleteItem(id);
+        refetchItems();
+      } catch (error) {
+        console.error('Error al eliminar el ítem:', error.message);
+      }
+    };
 
     const handleSearchItem = async (values) => {
         setIsLoading(true);
@@ -181,6 +213,7 @@ const SicoesItems = () => {
                 handlePrevPage={handlePrevPage}
                 handleFirstPage={handleFirstPage}
                 handleLastPage={handleLastPage}
+                handleAnyPage={handleAnyPage}
                 totalPages={itemsSicoesData?.totalPages || 0}
                 totalElements={itemsSicoesData?.totalElements || 0}
                 page={page} />

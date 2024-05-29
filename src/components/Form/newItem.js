@@ -21,7 +21,6 @@ const FormNewItem = ({ onSubmit, onClose, isLoading }) => {
                                 <div className="text-left rtl:text-right">
                                     <div role="status">
                                         <CircularProgress size={16} className="inlinetext-gray-200 animate-spin dark:text-gray-600 fill-blue-600" />
-                                        <span className="sr-only">Loading...</span>
                                     </div>
                                 </div>
                             ) : (

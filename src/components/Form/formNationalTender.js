@@ -11,49 +11,51 @@ const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
                 publicationTo: '',
                 presentationFrom: '',
                 presentationTo: '',
-
             }}
             onSubmit={(values) => onSubmit(values)}
         >
             {() => (
-                <Form className="flex flex-col space-y-4 ">
-                    <div className="flex items-center space-x-4">
-                        <label htmlFor="publicacionDesde" className="font-semibold text-gray-800 text-sm">
-                            Publicación Desde:
-                        </label>
-                        <Field
-                            type="date"
-                            className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            id="publicacionDesde"
-                            name="publicacionDesde"
-                        />
-                        <span className="text-base">Y</span>
-                        <Field
-                            type="date"
-                            className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            id="publicacionHasta"
-                            name="publicacionHasta"
-                        />
-
-                        <label htmlFor="presentacionDesde" className="font-semibold text-gray-800 text-sm">
-                            Presentación Desde:
-                        </label>
-                        <Field
-                            type="date"
-                            className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            id="presentacionDesde"
-                            name="presentacionDesde"
-                        />
-                        <span className="text-base">Y</span>
-                        <Field
-                            type="date"
-                            className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                            id="presentacionHasta"
-                            name="presentacionHasta"
-                        />
+                <Form className="flex flex-col space-y-4">
+                    <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                        <div className="flex items-center space-x-2">
+                            <label htmlFor="publicacionDesde" className="font-semibold text-gray-800 text-sm">
+                                Publicación Desde:
+                            </label>
+                            <Field
+                                type="date"
+                                className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                id="publicacionDesde"
+                                name="publicacionDesde"
+                            />
+                            <span className="text-base">Y</span>
+                            <Field
+                                type="date"
+                                className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                id="publicacionHasta"
+                                name="publicacionHasta"
+                            />
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <label htmlFor="presentacionDesde" className="font-semibold text-gray-800 text-sm">
+                                Presentación Desde:
+                            </label>
+                            <Field
+                                type="date"
+                                className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                id="presentacionDesde"
+                                name="presentacionDesde"
+                            />
+                            <span className="text-base">Y</span>
+                            <Field
+                                type="date"
+                                className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                id="presentacionHasta"
+                                name="presentacionHasta"
+                            />
+                        </div>
                     </div>
-                    <div className="flex items-center justify-center max-w-sm mx-auto">
-                        <div className="relative w-full">
+                    <div className="flex flex-col md:flex-row items-center justify-center">
+                        <div className="relative w-full md:w-auto">
                             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <Search className="w-4 h-4 text-blue-700" />
                             </div>
@@ -67,7 +69,7 @@ const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
                         </div>
                         <button
                             type="submit"
-                            className="p-1.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-300 hover:text-blue-700 hover:text-sm"
+                            className="p-1.5 ms-2 md:ms-4 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-300 hover:text-blue-700 hover:text-sm"
                         >
                             Buscar
                         </button>
