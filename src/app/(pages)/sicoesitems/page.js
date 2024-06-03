@@ -176,6 +176,7 @@ const SicoesItems = () => {
         try {
             const response = await postItem(newItemObject(dataSicoes));
             refetchItems();
+            setShowModal(false);
         } catch (error) {
             console.error('Error al guardar el ítem:', error.message);
         }

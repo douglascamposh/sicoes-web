@@ -1,4 +1,8 @@
 import puppeteer from "puppeteer";
+const fs = require("fs");
+const Captcha = require("2captcha-ts");
+const APIKEY = '';
+const solver = new Captcha.Solver(APIKEY);
 
 const parseCuseId = (id) => {
   const cuce = id.split("-");
@@ -15,8 +19,9 @@ export default async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 1,
+      devtools: true,
     });
     const page = await browser.newPage();
     await page.goto("https://www.sicoes.gob.bo/portal/contrataciones/busqueda/convocatorias.php?tipo=convNacional");
@@ -30,23 +35,23 @@ export default async (req, res) => {
     await page.waitForSelector('.cuce input[name="cuce1"]');
     await page.click('label:nth-child(2) div ins');
     
-   if (cuceID) {
-    const separeData = parseCuseId(cuceID);
-    const CUCE_FIELD_NAMES = ['cuce1', 'cuce2', 'cuce3', 'cuce4', 'cuce5', 'cuce6'];
-  
-    if (separeData.length <= 1) {
-      await page.type('.cuce input[name="cuce4"]', separeData[0] || '');
-    } else {
-      for (let i = 0; i < Math.min(separeData.length, CUCE_FIELD_NAMES.length); i++) {
-        await page.type(`.cuce input[name="${CUCE_FIELD_NAMES[i]}"]`, separeData[i]);
+    if (cuceID) {
+      const separeData = parseCuseId(cuceID);
+      const CUCE_FIELD_NAMES = ['cuce1', 'cuce2', 'cuce3', 'cuce4', 'cuce5', 'cuce6'];
+    
+      if (separeData.length <= 1) {
+        await page.type('.cuce input[name="cuce4"]', separeData[0] || '');
+      } else {
+        for (let i = 0; i < Math.min(separeData.length, CUCE_FIELD_NAMES.length); i++) {
+          await page.type(`.cuce input[name="${CUCE_FIELD_NAMES[i]}"]`, separeData[i]);
+        }
       }
     }
-  }
-   
+
     await page.click('.busquedaForm');
     await page.waitForSelector('#tablaSimple');
 
-    let data = await page.evaluate(() => {
+    let data = await page.evaluate(async () => {
       const table = document.querySelector('#tablaSimple');
       const rows = table ? table.querySelectorAll('tbody tr') : [];
       const dataArray = [];
@@ -63,14 +68,51 @@ export default async (req, res) => {
         dataObject.publishDateItem = columns[6].innerText || 0;
         dataObject.presentationDate= columns[7].innerText || 0;
         // dataObject.Archivos = columns[9].innerText || '';
-        // dataObject.Formularios = columns[10].innerText || '';
+        dataObject.forms = columns[10].innerText || '';
         // dataObject.Reportes = columns[11].innerText|| '';
+        if(dataObject.forms.includes('170')) {
+          columns[10].childNodes.forEach(async item => {
+            if(item.innerText.includes('170')){
+              await item.click('a');
+            }
+          });
+        }
         dataArray.push(dataObject);
 
       }
-
       return dataArray;
     });
+    await page.waitForSelector('#modal-download', { visible: true });
+    const img = await page.$('#captchasp img');
+    const imgUrl = await page.$eval('#captchasp img', img => img.src);
+    const path = './public/' + imgUrl.split('/').pop();
+    await img.screenshot({ path: path });
+    
+    const getCaptchaAnswer = async (imgPath) => {
+      try {
+        //send captcha
+        const base64Captcha = fs.readFileSync(imgPath, "base64");
+        const res = await solver.imageCaptcha({
+          body: base64Captcha,
+        });
+        return res.data;
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    
+    const captchaResponse = await getCaptchaAnswer(path);
+
+    await page.type('#captchasp input[name="captcha"]', captchaResponse || '');
+    await page.click('#btnsubmitfordes');
+    
+    await page.waitForSelector('#visualizarformulario0');
+
+    const date = await page.evaluate(async () => {
+      const form = document.querySelector('#visualizarformulario0');
+      const rows = form ? form.querySelectorAll('table tbody tr td table tbody tr') : [];
+    });
+    
     await browser.close();
     return res.status(200).json({ message: "Success", data });
   } catch (error) {
@@ -78,7 +120,3 @@ export default async (req, res) => {
     return res.status(500).json({ error: error });
   }
 }
-
-
-
-
