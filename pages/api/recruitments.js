@@ -106,11 +106,14 @@ export default async (req, res) => {
     await page.type('#captchasp input[name="captcha"]', captchaResponse || '');
     await page.click('#btnsubmitfordes');
     
-    await page.waitForSelector('#visualizarformulario0');
+    await page.waitForSelector('#visualizarformulario0', { visible: true });
+    await page.waitForSelector('.FormularioDatoCentreado');    
 
-    const date = await page.evaluate(async () => {
-      const form = document.querySelector('#visualizarformulario0');
-      const rows = form ? form.querySelectorAll('table tbody tr td table tbody tr') : [];
+    const date = await page.evaluate(() => {
+      const find = "//td[contains(text(),'publicación')]";
+      const result = document.evaluate(find, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      const date = result.parentElement.parentElement.children[1].children[0].innerText;
+      // data[0].presentationDate = date;
     });
     
     await browser.close();
