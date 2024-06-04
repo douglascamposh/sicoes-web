@@ -33,7 +33,8 @@ export default async (req, res) => {
     const row = await page.$('.row');
     await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
     await page.waitForSelector('.cuce input[name="cuce1"]');
-    await page.click('label:nth-child(2) div ins');
+    // await page.click('label:nth-child(2) div ins'); //click on 'Solo vigentes' radio button
+    // consider if the option 'Todos' is selected there is the possible get other states like 'Desierto'
     
     if (cuceID) {
       const separeData = parseCuseId(cuceID);
@@ -50,44 +51,41 @@ export default async (req, res) => {
 
     await page.click('.busquedaForm');
     await page.waitForSelector('#tablaSimple');
-
     let data = await page.evaluate(async () => {
       const table = document.querySelector('#tablaSimple');
       const rows = table ? table.querySelectorAll('tbody tr') : [];
       const dataArray = [];
-      for (const row of rows){
+      for (const row of rows) {
         const columns = row.querySelectorAll('td');
         const dataObject = {};
-        dataObject.cuce = columns[0].innerText || '';
-        dataObject.entity = columns[1].innerText;
-        dataObject.contract = columns[2].innerText || '';
-        dataObject.modality = columns[3].innerText || '';
-        dataObject.contractDescription = columns[4].innerText || '';
-        dataObject.auction = columns[5].innerText || false;
-        dataObject.stateAuction = columns[8].innerText || '';
-        dataObject.publishDateItem = columns[6].innerText || 0;
-        dataObject.presentationDate= columns[7].innerText || 0;
-        // dataObject.Archivos = columns[9].innerText || '';
-        dataObject.forms = columns[10].innerText || '';
-        // dataObject.Reportes = columns[11].innerText|| '';
-        if(dataObject.forms.includes('170')) {
-          columns[10].childNodes.forEach(async item => {
-            if(item.innerText.includes('170')){
-              await item.click('a');
-            }
-          });
-        }
-        dataArray.push(dataObject);
+        if(columns.length > 1) {
+          dataObject.cuce = columns[0].innerText || '';
+          dataObject.entity = columns[1].innerText;
+          dataObject.contract = columns[2].innerText || '';
+          dataObject.modality = columns[3].innerText || '';
+          dataObject.contractDescription = columns[4].innerText || '';
+          dataObject.auction = columns[5].innerText || false;
+          dataObject.stateAuction = columns[8].innerText || '';
+          dataObject.publishDateItem = columns[6].innerText || 0;
+          dataObject.presentationDate= columns[7].innerText || 0;
+          // dataObject.Archivos = columns[9].innerText || '';
+          dataObject.forms = columns[10].innerText || '';
+          // dataObject.Reportes = columns[11].innerText|| '';
 
+          if(dataObject.forms.includes('170')) {
+            columns[10].childNodes.forEach(async item => {
+              if(item.innerText.includes('170')){
+                await item.click('a');
+                dataObject.displayCaptcha = true;
+              }
+            });
+          }
+          dataArray.push(dataObject);
+        }
       }
       return dataArray;
     });
-    await page.waitForSelector('#modal-download', { visible: true });
-    const img = await page.$('#captchasp img');
-    const imgUrl = await page.$eval('#captchasp img', img => img.src);
-    const path = './public/' + imgUrl.split('/').pop();
-    await img.screenshot({ path: path });
-    
+
     const getCaptchaAnswer = async (imgPath) => {
       try {
         //send captcha
@@ -101,20 +99,27 @@ export default async (req, res) => {
       }
     };
     
-    const captchaResponse = await getCaptchaAnswer(path);
+    if(data && data.length > 0 && data[0].displayCaptcha) {
+      const modalCaptcha = await page.waitForSelector('#modal-download', { visible: true });
+      const img = await page.$('#captchasp img');
+      const imgUrl = await page.$eval('#captchasp img', img => img.src);
+      const path = './public/' + imgUrl.split('/').pop();
+      await img.screenshot({ path: path });
+      const captchaResponse = await getCaptchaAnswer(path);
 
-    await page.type('#captchasp input[name="captcha"]', captchaResponse || '');
-    await page.click('#btnsubmitfordes');
-    
-    await page.waitForSelector('#visualizarformulario0', { visible: true });
-    await page.waitForSelector('.FormularioDatoCentreado');    
+      await page.type('#captchasp input[name="captcha"]', captchaResponse || '');
+      await page.click('#btnsubmitfordes');
+      
+      await page.waitForSelector('#visualizarformulario0', { visible: true });
+      await page.waitForSelector('.FormularioDatoCentreado');    
 
-    const date = await page.evaluate(() => {
-      const find = "//td[contains(text(),'publicación')]";
-      const result = document.evaluate(find, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-      const date = result.parentElement.parentElement.children[1].children[0].innerText;
-      // data[0].presentationDate = date;
-    });
+      const date = await page.evaluate(() => {
+        const find = "//td[contains(text(),'publicación')]";
+        const result = document.evaluate(find, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        const date = result.parentElement.parentElement.children[1].children[0].innerText;
+        // data[0].presentationDate = date;
+      });
+    }
     
     await browser.close();
     return res.status(200).json({ message: "Success", data });
