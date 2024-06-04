@@ -54,6 +54,23 @@ export const transformData = (data) => {
             }
       
   })
-
   return adaptData;
 }
+
+export const transformedItem = (obj) => {
+    return {
+        id: obj.id || '',
+        cuce: obj.cuce || '',
+        entity: obj.entity || '',
+        contract: obj.contract || '',
+        modality: obj.modality || '',
+        contractDescription: obj.contractDescription || '',
+        auction: convertStringToBoolean(obj.auction) || false,
+        stateAuction: obj.stateAuction || 0,
+        publishDateItem: convertDateToMiliSeconds(obj.presentationDate) || 0,
+        presentationDate: convertDateToMiliSeconds(obj.publishDateItem) || 0,
+        awardDate: 0,
+    }
+}
+
+

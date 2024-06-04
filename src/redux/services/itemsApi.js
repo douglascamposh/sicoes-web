@@ -36,7 +36,14 @@ export const itemsApi = createApi({
         url: `/items/${id}`,
       }),
      // invalidatesTags: ['Items'],
-    })
+    }),
+    editItem: builder.mutation({
+      query: ({ id, item }) => ({
+        method: 'PUT',
+        url: `/items/${id}`,
+        body: item,
+      }),
+    }),
   }),
 });
 
@@ -44,4 +51,5 @@ export const {
   useGetItemsQuery,
   usePostItemMutation,
   useDeleteItemMutation,
+  useEditItemMutation,
 } = itemsApi;

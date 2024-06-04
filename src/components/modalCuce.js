@@ -1,7 +1,7 @@
 import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 
-const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit }) => {
+const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit ,title}) => {
     if (!isOpen) return null;
 
     return (
@@ -9,7 +9,7 @@ const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit }) => {
             <div className="relative p-4 w-full max-w-2xl max-h-full bg-white rounded-lg shadow 0">
                 <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-blue-600">
                     <h3 className="text-xl font-semibold text-blue-700">
-                        AGREGAR NUEVO SICOES
+                        {title}
                     </h3>
                     <button
                         type="button"

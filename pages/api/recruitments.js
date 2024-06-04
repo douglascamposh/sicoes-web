@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 const fs = require("fs");
 const Captcha = require("2captcha-ts");
-const APIKEY = '';
+const APIKEY = process.env.NEXT_PUBLIC_2CAPTCHA_API_KEY;
 const solver = new Captcha.Solver(APIKEY);
 
 const parseCuseId = (id) => {

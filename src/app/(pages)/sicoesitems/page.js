@@ -2,19 +2,17 @@
 import React, { useState, useEffect } from "react";
 import Table from "@/components/table";
 import FormNationalTender from "@/components/Form/formNationalTender";
-import ModalCuce from "@/components/modal";
+import ModalCuce from "@/components/modalCuce";
 import FormNewItem from "@/components/Form/newItem";
 import SicoesData from "@/components/sicoesData";
-import { usePostItemMutation, useGetItemsQuery, useDeleteItemMutation} from "@/redux/services/itemsApi";
+import { usePostItemMutation, useGetItemsQuery, useDeleteItemMutation, useEditItemMutation } from "@/redux/services/itemsApi";
 import AddIcon from '@mui/icons-material/Add';
-import { transformData, newItemObject } from "@/app/functions/utilities";
+import { transformData, newItemObject ,transformedItem} from "@/app/functions/utilities";
 import { useDispatch, useSelector } from "react-redux";
 import { nextPage, prevPage, firsPage, lastPage, searchCuce, anyPage } from "@/redux/slice/paginationSlice";
 import DeleteIcon from '@mui/icons-material/Delete';
-
-
+import CachedIcon from '@mui/icons-material/Cached';
 const SicoesItems = () => {
-
     const headers = [
         {
             accessorKey: 'cuce',
@@ -52,21 +50,36 @@ const SicoesItems = () => {
             header: 'Estado',
         },
         {
+            accessorKey: 'refresh',
+            header: 'Refrescar',
+            cell: ({row}) => {
+                return (
+                    <div className="flex items-center justify-center text-blue-800">
+                        <button onClick={() => handlerefresh(row)} disabled={isRefreshing[row.original.id] ? true:false}>
+
+                            <CachedIcon
+                                className={`${isRefreshing[row.original.id] ? 'animate-spin' : ''}`}
+                            />
+                        </button>
+                    </div>)
+            }
+        },
+        {
             accessorKey: 'deleteRow',
             header: 'Eliminar',
             cell: ({ row }) => (
                 <button
-                className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-2 rounded-md shadow-md transition duration-300 ease-in-out"
-                onClick={() => {
-                  if (window.confirm('¿Estás seguro de que quieres eliminar?')) {
-                    handleDeleteItems(row.original.id);
-                  }
-                }}
-              >
-                <DeleteIcon className="h-5 w-5" />
-              </button>
+                    className="  text-red-600 font-bold py-2 px-2  rounded-md transition duration-300 ease-in-out"
+                    onClick={() => {
+                        if (window.confirm('¿Estás seguro de que quieres eliminar?')) {
+                            handleDeleteItems(row.original.id);
+                        }
+                    }}
+                >
+                    <DeleteIcon className="h-5 w-5" />
+                </button>
             ),
-          }
+        },
     ];
 
 
@@ -93,8 +106,12 @@ const SicoesItems = () => {
     const [data, setData] = useState([]);
     const [dataSicoes, setDataSicoes] = useState({});
     const [showModal, setShowModal] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState({});
     const [postItem] = usePostItemMutation();
     const [deleteItem] = useDeleteItemMutation();
+    const [editItem] = useEditItemMutation();
+
+    const titleModal = "AGREGAR NUEVO SICOES ITEM";
 
     //add when we have limit
     const { data: itemsSicoesData, refetch: refetchItems } = useGetItemsQuery({
@@ -138,15 +155,42 @@ const SicoesItems = () => {
         dispatch(anyPage(page));
         refetchItems();
     }
-    
+
     const handleDeleteItems = async (id) => {
-      try {
-        await deleteItem(id);
-        refetchItems();
-      } catch (error) {
-        console.error('Error al eliminar el ítem:', error.message);
-      }
+        try {
+            await deleteItem(id);
+            refetchItems();
+        } catch (error) {
+            console.error('Error al eliminar el ítem:', error.message);
+        }
     };
+
+    const handlerefresh = async (row) => {
+        try {
+          setIsRefreshing({ [row.original.id]: true });
+          const response = await fetch('/api/recruitments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              cuceID: row.original.cuce.trim(),
+            }),
+          });
+      
+          if (response.ok) {
+            const result = await response.json();
+            const itemToUpdate = {
+                id: row.original.id,
+                ...Object(result.data[0]),
+              };
+                await editItem({id:row.original.id,  item: transformedItem(itemToUpdate) });
+                setIsRefreshing({ [row.original.id]: false });
+          } else {
+            setIsRefreshing({ [row.original.id]: false });
+          }
+        } catch (error) {
+          setIsRefreshing({ [row.original.id]: false });
+        }
+      };
 
     const handleSearchItem = async (values) => {
         setIsLoading(true);
@@ -155,7 +199,7 @@ const SicoesItems = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    cuceID: values.newCuce,
+                    cuceID: values.newCuce.trim(),
                 }),
             });
 
@@ -202,7 +246,7 @@ const SicoesItems = () => {
             <div className="h-0.5 bg-blue-700 mb-4"></div>
             <div className="flex justify-center">
                 <FormNationalTender onSubmit={handleSearchById} onNewItemClick={() => setShowModal(true)} />
-                <ModalCuce isOpen={showModal} onClose={handleModalClose} handleNewItemSubmit={handleNewItemSubmit}>
+                <ModalCuce title={titleModal} isOpen={showModal} onClose={handleModalClose} handleNewItemSubmit={handleNewItemSubmit}>
                     <FormNewItem onSubmit={handleSearchItem} isLoading={isLoading} />
                     <SicoesData dataSicoes={dataSicoes} sicoesDataFields={sicoesDataFields} />
                 </ModalCuce>
