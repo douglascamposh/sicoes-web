@@ -7,11 +7,12 @@ import FormNewItem from "@/components/Form/newItem";
 import SicoesData from "@/components/sicoesData";
 import { usePostItemMutation, useGetItemsQuery, useDeleteItemMutation, useEditItemMutation } from "@/redux/services/itemsApi";
 import AddIcon from '@mui/icons-material/Add';
-import { transformData, newItemObject ,transformedItem} from "@/app/functions/utilities";
+import { transformData, newItemObject, transformedItem } from "@/app/functions/utilities";
 import { useDispatch, useSelector } from "react-redux";
 import { nextPage, prevPage, firsPage, lastPage, searchCuce, anyPage } from "@/redux/slice/paginationSlice";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CachedIcon from '@mui/icons-material/Cached';
+import { toast } from 'react-toastify';
 const SicoesItems = () => {
     const headers = [
         {
@@ -52,10 +53,10 @@ const SicoesItems = () => {
         {
             accessorKey: 'refresh',
             header: 'Refrescar',
-            cell: ({row}) => {
+            cell: ({ row }) => {
                 return (
                     <div className="flex items-center justify-center text-blue-800">
-                        <button onClick={() => handlerefresh(row)} disabled={isRefreshing[row.original.id] ? true:false}>
+                        <button onClick={() => handlerefresh(row)} disabled={isRefreshing[row.original.id] ? true : false}>
 
                             <CachedIcon
                                 className={`${isRefreshing[row.original.id] ? 'animate-spin' : ''}`}
@@ -68,13 +69,10 @@ const SicoesItems = () => {
             accessorKey: 'deleteRow',
             header: 'Eliminar',
             cell: ({ row }) => (
+                //handleDeleteItems(row.original.id);
                 <button
                     className="  text-red-600 font-bold py-2 px-2  rounded-md transition duration-300 ease-in-out"
-                    onClick={() => {
-                        if (window.confirm('¿Estás seguro de que quieres eliminar?')) {
-                            handleDeleteItems(row.original.id);
-                        }
-                    }}
+                    onClick={() => handleDeleteItemModal(row.original.id)}
                 >
                     <DeleteIcon className="h-5 w-5" />
                 </button>
@@ -106,13 +104,15 @@ const SicoesItems = () => {
     const [data, setData] = useState([]);
     const [dataSicoes, setDataSicoes] = useState({});
     const [showModal, setShowModal] = useState(false);
+    const [showModalDelete, setShowModalDelete] = useState(false);
+    const [selectedItemToDelete, setSelectedItemToDelete] = useState(null);
     const [isRefreshing, setIsRefreshing] = useState({});
     const [postItem] = usePostItemMutation();
     const [deleteItem] = useDeleteItemMutation();
     const [editItem] = useEditItemMutation();
 
     const titleModal = "AGREGAR NUEVO SICOES ITEM";
-
+    const titleModalDelete = "ELIMINAR SICOES ITEM";
     //add when we have limit
     const { data: itemsSicoesData, refetch: refetchItems } = useGetItemsQuery({
         page: page,
@@ -156,41 +156,38 @@ const SicoesItems = () => {
         refetchItems();
     }
 
-    const handleDeleteItems = async (id) => {
-        try {
-            await deleteItem(id);
-            refetchItems();
-        } catch (error) {
-            console.error('Error al eliminar el ítem:', error.message);
-        }
-    };
-
     const handlerefresh = async (row) => {
         try {
-          setIsRefreshing({ [row.original.id]: true });
-          const response = await fetch('/api/recruitments', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              cuceID: row.original.cuce.trim(),
-            }),
-          });
-      
-          if (response.ok) {
-            const result = await response.json();
-            const itemToUpdate = {
-                id: row.original.id,
-                ...Object(result.data[0]),
-              };
-                await editItem({id:row.original.id,  item: transformedItem(itemToUpdate) });
+            setIsRefreshing({ [row.original.id]: true });
+            const response = await fetch('/api/recruitments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cuceID: row.original.cuce.trim(),
+                }),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                const itemToUpdate = {
+                    id: row.original.id,
+                    ...Object(result.data[0]),
+                };
+                await editItem({ id: row.original.id, item: transformedItem(itemToUpdate) });
+                toast.success("Item Actualizado correctamente",{
+                    position : "bottom-right"
+                })
                 setIsRefreshing({ [row.original.id]: false });
-          } else {
-            setIsRefreshing({ [row.original.id]: false });
-          }
+            } else {
+                setIsRefreshing({ [row.original.id]: false });
+                toast.error("Error al actualizar el item",{
+                    position : "bottom-right"
+                })
+            }
         } catch (error) {
-          setIsRefreshing({ [row.original.id]: false });
+            setIsRefreshing({ [row.original.id]: false });
         }
-      };
+    };
 
     const handleSearchItem = async (values) => {
         setIsLoading(true);
@@ -229,8 +226,38 @@ const SicoesItems = () => {
     const handleModalClose = () => {
         setShowModal(false);
         setDataSicoes('');
-    };
+    }
+    const handleModalDeleteClose = () => {
+        setShowModalDelete(false);
+    }
 
+    const handleDeleteItemModal = (id) => {
+        setSelectedItemToDelete(id);
+        setShowModalDelete(true);
+    }
+
+    const handleDeleteItems = async () => {
+        try {
+          const response = await deleteItem(selectedItemToDelete);
+          if (response.error.originalStatus === 200) {
+            refetchItems();
+            setShowModalDelete(false);
+            setSelectedItemToDelete(null);
+            toast.success("Item eliminado exitosamente", {
+              position: "bottom-right",
+            });
+          } else {
+            toast.error("Error al eliminar el elemento",{
+                position : "bottom-right"
+            });
+          }
+        } catch (error) {
+          console.error('Error al eliminar el ítem:', error.message);
+          toast.error("Error al eliminar el elemento",{
+            position : "bottom-right"
+        });
+        }
+      };
     return (
         <div className="w-full mx-auto max-w-screen-2xl p-4 mt-8 bg-white rounded-lg shadow-lg shadow-blue-900">
             <h1 className="text-xl font-bold text-center mb-4">Búsqueda de Procesos de Contrataciones Nacionales</h1>
@@ -246,9 +273,28 @@ const SicoesItems = () => {
             <div className="h-0.5 bg-blue-700 mb-4"></div>
             <div className="flex justify-center">
                 <FormNationalTender onSubmit={handleSearchById} onNewItemClick={() => setShowModal(true)} />
-                <ModalCuce title={titleModal} isOpen={showModal} onClose={handleModalClose} handleNewItemSubmit={handleNewItemSubmit}>
+                <ModalCuce
+                    title={titleModal}
+                    isOpen={showModal}
+                    onClose={handleModalClose}
+                    handleNewItemSubmit={handleNewItemSubmit}
+                    submitButtonText="Agregar"
+                    cancelButtonText="Cancelar"
+                >
                     <FormNewItem onSubmit={handleSearchItem} isLoading={isLoading} />
                     <SicoesData dataSicoes={dataSicoes} sicoesDataFields={sicoesDataFields} />
+                </ModalCuce>
+            </div>
+            <div>
+                <ModalCuce
+                    title={titleModalDelete}
+                    isOpen={showModalDelete}
+                    onClose={handleModalDeleteClose}
+                    handleNewItemSubmit={handleDeleteItems}
+                    submitButtonText="Eliminar"
+                    cancelButtonText="Cancelar"
+                >
+                    <h1>¿Seguro que quieres eliminar este Item?</h1>
                 </ModalCuce>
             </div>
             <Table className="my-10 mt-22 mx-4"

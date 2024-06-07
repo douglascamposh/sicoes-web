@@ -19,7 +19,7 @@ export default async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 1,
       devtools: true,
     });

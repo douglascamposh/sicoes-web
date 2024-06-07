@@ -1,7 +1,7 @@
 import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 
-const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit ,title}) => {
+const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit ,title,submitButtonText,cancelButtonText}) => {
     if (!isOpen) return null;
 
     return (
@@ -29,14 +29,14 @@ const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit ,title}) => 
                             onClose();
                         }}
                     >
-                        Agregar
+                        {submitButtonText}
                     </button>
                     <button
                         type="button"
                         className="py-2.5 px-5 ms-3 text-sm font-medium text-blue-900 focus:outline-none bg-white rounded-lg border border-blue-400 hover:bg-blue-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-700 "
                         onClick={onClose}
                     >
-                        Cancelar
+                        {cancelButtonText}
                     </button>
                 </div>
             </div>
