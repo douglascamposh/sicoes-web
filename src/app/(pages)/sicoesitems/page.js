@@ -260,7 +260,7 @@ const SicoesItems = () => {
       };
     return (
         <div className="w-full mx-auto max-w-screen-2xl p-4 mt-8 bg-white rounded-lg shadow-lg shadow-blue-900">
-            <h1 className="text-xl font-bold text-center mb-4">Búsqueda de Procesos de Contrataciones Nacionales</h1>
+            <h1 className="text-xl font-bold font-serif text-center mb-4">Búsqueda de Procesos de Contrataciones Nacionales</h1>
             <div className="flex justify-end">
                 <button
                     type="button"
