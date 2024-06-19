@@ -13,23 +13,29 @@ import { nextPage, prevPage, firsPage, lastPage, searchCuce, anyPage } from "@/r
 import DeleteIcon from '@mui/icons-material/Delete';
 import CachedIcon from '@mui/icons-material/Cached';
 import { toast } from 'react-toastify';
+import Title from "@/components/common/title";
+import DescriptionContent from "@/components/common/description";
+
 const SicoesItems = () => {
     const headers = [
         {
             accessorKey: 'cuce',
             header: 'Cuce',
+            cell : ({row}) => (<DescriptionContent>{row.original.cuce}</DescriptionContent>)
         },
         {
             accessorKey: 'entity',
             header: 'Entidad',
+            cell : ({row}) => (<DescriptionContent>{row.original.entity}</DescriptionContent>)
         },
         {
             accessorKey: 'contractDescription',
-            header: 'Tipo Contratación',
+            header: 'Tipo Contratación', cell : ({row}) => (<DescriptionContent>{row.original.contractDescription}</DescriptionContent>)
         },
         {
             accessorKey: 'modality',
             header: 'Modalidad',
+            cell : ({row}) => (<DescriptionContent>{row.original.modality}</DescriptionContent>)
         },
         {
             accessorKey: 'auction',
@@ -37,18 +43,22 @@ const SicoesItems = () => {
             meta: {
                 filterVariant: 'select',
             },
+            cell : ({row}) => (<DescriptionContent>{row.original.auction}</DescriptionContent>)
         },
         {
             accessorKey: 'publishDateItem',
             header: 'Fecha de Publicación',
+            cell : ({row}) => (<DescriptionContent>{row.original.publishDateItem}</DescriptionContent>)
         },
         {
             accessorKey: 'presentationDate',
             header: 'Fecha de Presentación',
+            cell : ({row}) => (<DescriptionContent>{row.original.presentationDate}</DescriptionContent>)
         },
         {
             accessorKey: 'stateAuction',
             header: 'Estado',
+            cell : ({row}) => (<DescriptionContent>{row.original.stateAuction}</DescriptionContent>)
         },
         {
             accessorKey: 'refresh',
@@ -113,6 +123,7 @@ const SicoesItems = () => {
 
     const titleModal = "AGREGAR NUEVO SICOES ITEM";
     const titleModalDelete = "ELIMINAR SICOES ITEM";
+    const titleTable = "Búsqueda de Procesos de Contrataciones Nacionales"
     //add when we have limit
     const { data: itemsSicoesData, refetch: refetchItems } = useGetItemsQuery({
         page: page,
@@ -260,14 +271,19 @@ const SicoesItems = () => {
       };
     return (
         <div className="w-full mx-auto max-w-screen-2xl p-4 mt-8 bg-white rounded-lg shadow-lg shadow-blue-900">
-            <h1 className="text-xl font-bold font-serif text-center mb-4">Búsqueda de Procesos de Contrataciones Nacionales</h1>
+             <Title className="text-center">
+                <h1 className="text-blue-500 text-xl">{titleTable}</h1>
+            </Title>
             <div className="flex justify-end">
                 <button
                     type="button"
                     className="flex items-end px-3 py-2 bg-blue-700 text-white hover:bg-blue-600  transition-colors duration-300 text-sm "
                     onClick={() => setShowModal(true)}
                 >
-                    <AddIcon className="text-lg mr-2" />Registrar Cuce
+                    <AddIcon className="text-lg mr-2" />
+                    <Title>
+                        <h1 className="text-white">{"Registrar Cuce"}</h1>
+                    </Title>
                 </button>
             </div>
             <div className="h-0.5 bg-blue-700 mb-4"></div>

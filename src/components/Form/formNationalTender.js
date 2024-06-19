@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { Search } from '@mui/icons-material';
+import Title from '../common/title';
 
 const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
     return (
@@ -19,7 +20,7 @@ const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
                     <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
                         <div className="flex items-center space-x-2">
                             <label htmlFor="publicacionDesde" className="font-semibold text-gray-800 text-sm">
-                                Publicación Desde:
+                                <Title>{"Publicación Desde:"}</Title>
                             </label>
                             <Field
                                 type="date"
@@ -27,7 +28,7 @@ const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
                                 id="publicacionDesde"
                                 name="publicacionDesde"
                             />
-                            <span className="text-base">Y</span>
+                            <span><Title>{"Y"}</Title></span>
                             <Field
                                 type="date"
                                 className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -37,7 +38,7 @@ const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
                         </div>
                         <div className="flex items-center space-x-2">
                             <label htmlFor="presentacionDesde" className="font-semibold text-gray-800 text-sm">
-                                Presentación Desde:
+                                <Title>{"Presentación Desde:"}</Title>
                             </label>
                             <Field
                                 type="date"
@@ -45,7 +46,7 @@ const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
                                 id="presentacionDesde"
                                 name="presentacionDesde"
                             />
-                            <span className="text-base">Y</span>
+                            <span><Title>{"Y"}</Title></span>
                             <Field
                                 type="date"
                                 className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -68,7 +69,9 @@ const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
                             </div>
                         </div>
                         <button type="submit"className="p-2  ms-2 md:ms-4 text-base md:text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-300 hover:text-blue-700">
-                            Buscar
+                        <Title>
+                            <div className='text-white'>{"Buscar"}</div>
+                        </Title>
                         </button>
                     </div>
                 </Form>

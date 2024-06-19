@@ -1,6 +1,7 @@
 import { Formik, Field, Form } from 'formik';
 import { Search, Add } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
+import Title from '../common/title';
 
 const FormNewItem = ({ onSubmit, onClose, isLoading }) => {
     return (
@@ -12,9 +13,6 @@ const FormNewItem = ({ onSubmit, onClose, isLoading }) => {
         >
             {() => (
                 <Form className="flex items-center max-w-sm mx-auto">
-                    <label htmlFor="simple-search" className="sr-only">
-                        Search
-                    </label>
                     <div className="relative w-full">
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                             {isLoading ? (
@@ -40,7 +38,9 @@ const FormNewItem = ({ onSubmit, onClose, isLoading }) => {
                         type="submit"
                         className="p-1.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-300 hover:text-blue-700 hover:text-sm"
                     >
-                        Buscar
+                        <Title>
+                            <div className='text-white'>{"Buscar"}</div>
+                        </Title>
                     </button>
                 </Form>
             )}

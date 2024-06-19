@@ -74,7 +74,7 @@ const TopMenu = () => {
                     <ul className="font-bold text-2xl flex flex-col w-full">
                         {navItems.map(({ href, label }) => (
                             <div>
-                                <li key={href} className="mr-[30px] ml-10">
+                                <li className="mr-[30px] ml-10">
                                     <NavItem href={href} onClick={handleSmallScreenNav} >
                                         {label}
                                     </NavItem>

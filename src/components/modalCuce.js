@@ -1,6 +1,6 @@
 import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-
+import Title from './common/title';
 const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit ,title,submitButtonText,cancelButtonText}) => {
     if (!isOpen) return null;
 
@@ -9,7 +9,7 @@ const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit ,title,submi
             <div className="relative p-4 w-full max-w-2xl max-h-full bg-white rounded-lg shadow 0">
                 <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-blue-600">
                     <h3 className="text-xl font-semibold text-blue-700">
-                        {title}
+                        <Title><h1 className="text-lg">{title}</h1></Title>
                     </h3>
                     <button
                         type="button"
@@ -29,14 +29,16 @@ const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit ,title,submi
                             onClose();
                         }}
                     >
-                        {submitButtonText}
+                        <Title>
+                            <div className='text-white'>{submitButtonText}</div>
+                        </Title>
                     </button>
                     <button
                         type="button"
                         className="py-2.5 px-5 ms-3 text-sm font-medium text-blue-900 focus:outline-none bg-white rounded-lg border border-blue-400 hover:bg-blue-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-700 "
                         onClick={onClose}
                     >
-                        {cancelButtonText}
+                        <Title>{cancelButtonText}</Title>
                     </button>
                 </div>
             </div>
