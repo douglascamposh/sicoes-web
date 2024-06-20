@@ -9,6 +9,19 @@ const parseCuseId = (id) => {
   return cuce;
 }
 
+const getCaptchaAnswer = async (imgPath) => {
+  try {
+    //send captcha
+    const base64Captcha = fs.readFileSync(imgPath, "base64");
+    const res = await solver.imageCaptcha({
+      body: base64Captcha,
+    });
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 export default async (req, res) => {
 
   if (req.method !== 'POST') {
@@ -19,7 +32,7 @@ export default async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       slowMo: 1,
       devtools: true,
     });
@@ -33,7 +46,7 @@ export default async (req, res) => {
     const row = await page.$('.row');
     await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
     await page.waitForSelector('.cuce input[name="cuce1"]');
-    // await page.click('label:nth-child(2) div ins'); //click on 'Solo vigentes' radio button
+    await page.click('label:nth-child(2) div ins'); //click on 'Solo vigentes' radio button
     // consider if the option 'Todos' is selected there is the possible get other states like 'Desierto'
     
     if (cuceID) {
@@ -55,7 +68,7 @@ export default async (req, res) => {
       const table = document.querySelector('#tablaSimple');
       const rows = table ? table.querySelectorAll('tbody tr') : [];
       const dataArray = [];
-      for (const row of rows) {
+      for (const row of rows) { //Todo this is valid in case that we need iterate a lot with the same cuce in our case discar and just get the firs element 'vigente'
         const columns = row.querySelectorAll('td');
         const dataObject = {};
         if(columns.length > 1) {
@@ -74,7 +87,7 @@ export default async (req, res) => {
 
           if(dataObject.forms.includes('170')) {
             columns[10].childNodes.forEach(async item => {
-              if(item.innerText.includes('170')){
+              if(item.innerText.includes('170')) {
                 await item.click('a');
                 dataObject.displayCaptcha = true;
               }
@@ -85,22 +98,9 @@ export default async (req, res) => {
       }
       return dataArray;
     });
-
-    const getCaptchaAnswer = async (imgPath) => {
-      try {
-        //send captcha
-        const base64Captcha = fs.readFileSync(imgPath, "base64");
-        const res = await solver.imageCaptcha({
-          body: base64Captcha,
-        });
-        return res.data;
-      } catch (err) {
-        console.log(err);
-      }
-    };
     
     if(data && data.length > 0 && data[0].displayCaptcha) {
-      const modalCaptcha = await page.waitForSelector('#modal-download', { visible: true });
+      await page.waitForSelector('#modal-download', { visible: true });
       const img = await page.$('#captchasp img');
       const imgUrl = await page.$eval('#captchasp img', img => img.src);
       const path = './public/' + imgUrl.split('/').pop();
