@@ -1,7 +1,7 @@
 import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-
-const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit }) => {
+import Title from './common/title';
+const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit ,title,submitButtonText,cancelButtonText}) => {
     if (!isOpen) return null;
 
     return (
@@ -9,7 +9,7 @@ const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit }) => {
             <div className="relative p-4 w-full max-w-2xl max-h-full bg-white rounded-lg shadow 0">
                 <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-blue-600">
                     <h3 className="text-xl font-semibold text-blue-700">
-                        AGREGAR NUEVO SICOES
+                        <Title><h1 className="text-lg">{title}</h1></Title>
                     </h3>
                     <button
                         type="button"
@@ -24,16 +24,21 @@ const ModalCuce = ({ isOpen, onClose, children, handleNewItemSubmit }) => {
                     <button
                         type="button"
                         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                        onClick={handleNewItemSubmit}
+                        onClick={() => {
+                            handleNewItemSubmit();
+                            onClose();
+                        }}
                     >
-                        Agregar
+                        <Title>
+                            <div className='text-white'>{submitButtonText}</div>
+                        </Title>
                     </button>
                     <button
                         type="button"
                         className="py-2.5 px-5 ms-3 text-sm font-medium text-blue-900 focus:outline-none bg-white rounded-lg border border-blue-400 hover:bg-blue-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-700 "
                         onClick={onClose}
                     >
-                        Cancelar
+                        <Title>{cancelButtonText}</Title>
                     </button>
                 </div>
             </div>

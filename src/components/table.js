@@ -4,18 +4,21 @@ import FirstPageSharpIcon from '@mui/icons-material/FirstPageSharp';
 import NavigateBeforeSharpIcon from '@mui/icons-material/NavigateBeforeSharp';
 import NavigateNextSharpIcon from '@mui/icons-material/NavigateNextSharp';
 import LastPageSharpIcon from '@mui/icons-material/LastPageSharp';
+import Title from './common/title';
+import DescriptionContent from './common/description';
 
-import { useReactTable,
-         getCoreRowModel,
-         getSortedRowModel,
-         getPaginationRowModel,
-         flexRender,
-         getFilteredRowModel} from '@tanstack/react-table';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  flexRender,
+  getFilteredRowModel
+} from '@tanstack/react-table';
 
-const Table = ({ data, columns, handleNextPage, handlePrevPage,handleFirstPage, handleLastPage, page, totalPages, totalElements}) => {
+const Table = ({ data, columns, handleNextPage, handlePrevPage, handleFirstPage, handleLastPage, page, totalPages, totalElements, handleAnyPage }) => {
 
   const [columnFilters, setColumnFilters] = useState([]);
-
   const table = useReactTable({
     columns,
     data,
@@ -23,7 +26,7 @@ const Table = ({ data, columns, handleNextPage, handlePrevPage,handleFirstPage, 
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getFilteredRowModel : getFilteredRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     onColumnFiltersChange: setColumnFilters,
     state: {
       columnFilters,
@@ -44,17 +47,19 @@ const Table = ({ data, columns, handleNextPage, handlePrevPage,handleFirstPage, 
                 <th
                   key={header.id}
                   colSpan={header.colSpan}
-                  className="px-2 py-2 text-left hover:bg-blue-700 cursor-pointer select-none border-r border-gray-300 text-sm"
+                  className="px-2 py-2 text-left hover:bg-blue-700 cursor-pointer select-none border-r border-gray-300"
                   onClick={header.column.getToggleSortingHandler()}
                 >
                   {header.isPlaceholder
                     ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                    : <Title>
+                      <h1 className='text-white'>{flexRender(header.column.columnDef.header, header.getContext())}</h1>
+                    </Title>}
                   {header.column.getCanFilter() && header.column.id === 'auction' ? (
-                     <div>
+                    <div>
                       <Filter column={header.column} />
-                     </div>
-                  ): null}
+                    </div>
+                  ) : null}
                 </th>
               ))}
             </tr>
@@ -85,42 +90,45 @@ const Table = ({ data, columns, handleNextPage, handlePrevPage,handleFirstPage, 
             className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
             onClick={handleFirstPage}
           >
-            <FirstPageSharpIcon/>
+            <FirstPageSharpIcon />
           </button>
           <button
             className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
+            disabled={page === 0}
             onClick={handlePrevPage}
           >
-            <NavigateBeforeSharpIcon/>
+            <NavigateBeforeSharpIcon />
           </button>
           <button
             className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
+            disabled={page === (totalPages - 1)}
             onClick={handleNextPage}
+
           >
-           <NavigateNextSharpIcon/>
+            <NavigateNextSharpIcon />
           </button>
           <button
             className="bg-blue-700 text-white px-1 py-1 rounded hover:bg-blue-600 text-xs"
-            onClick={() => handleLastPage(totalPages-1)}
+            onClick={() => handleLastPage(totalPages - 1)}
           >
-            <LastPageSharpIcon/>
+            <LastPageSharpIcon />
           </button>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-gray-700 text-xs">
-            Página {page+1} de{' '}
+            Página {page + 1} de{' '}
             {totalPages}
           </span>
           <span className="flex items-center gap-1 text-xs">
             | Ir a la página:
             <input
               type="number"
-              defaultValue={table.getState().pagination.pageIndex + 1}
+              defaultValue={1}
+              className="border p-1 rounded w-16 text-xs"
               onChange={(e) => {
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
-                table.setPageIndex(page);
+                handleAnyPage(page);
               }}
-              className="border p-1 rounded w-16 text-xs"
             />
           </span>
         </div>
