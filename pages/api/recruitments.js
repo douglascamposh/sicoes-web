@@ -32,9 +32,8 @@ export default async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       slowMo: 1,
-      devtools: true,
     });
     const page = await browser.newPage();
     await page.goto("https://www.sicoes.gob.bo/portal/contrataciones/busqueda/convocatorias.php?tipo=convNacional");
@@ -117,8 +116,12 @@ export default async (req, res) => {
         const find = "//td[contains(text(),'publicación')]";
         const result = document.evaluate(find, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         const date = result.parentElement.parentElement.children[1].children[0].innerText;
-        // data[0].presentationDate = date;
+        console.info('date ->>>>>>>>', date);
+        return date;
       });
+      console.log('date>>>>>?????????', date);
+      data[0].form170Date = date ? date : null;
+      
     }
     
     await browser.close();

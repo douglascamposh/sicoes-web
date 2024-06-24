@@ -56,6 +56,11 @@ const SicoesItems = () => {
             cell : ({row}) => (<DescriptionContent>{row.original.presentationDate}</DescriptionContent>)
         },
         {
+            accessorKey: 'form170Date',
+            header: '170 Fecha de Publicación',
+            cell : ({row}) => (<DescriptionContent>{row.original.form170Date}</DescriptionContent>)
+        },
+        {
             accessorKey: 'stateAuction',
             header: 'Estado',
             cell : ({row}) => (<DescriptionContent>{row.original.stateAuction}</DescriptionContent>)
@@ -101,9 +106,9 @@ const SicoesItems = () => {
         { label: 'Estado de la Subasta', key: 'stateAuction' },
         { label: 'Fecha de Presentación', key: 'presentationDate' },
         { label: 'Fecha de Publicación', key: 'publishDateItem' },
+        { label: '170 Fecha de Publicación', key: 'form170Date' },
         { label: 'Archivos', key: 'Archivos' },
         { label: 'Formularios', key: 'Formularios' },
-        { label: 'Reportes', key: 'Reportes' },
     ];
 
 
@@ -215,6 +220,7 @@ const SicoesItems = () => {
                 const result = await response.json();
                 setDataSicoes(Object(result.data[0]));
             } else {
+                //TODO show in the UI try again or something like that
                 console.error('Error al obtener los datos');
             }
         } catch (error) {
