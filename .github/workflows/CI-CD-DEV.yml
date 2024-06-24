@@ -53,6 +53,8 @@ jobs:
     - name: Install depenencies
       run: npm install
     - name: Create and populate .env.local file
+      env:
+        NEXT_PUBLIC_2CAPTCHA_API_KEY: ${{ secrets.CAPTCHA_API_KEY }}
       run: |
         touch .env.local
         echo "cat .env.local"
