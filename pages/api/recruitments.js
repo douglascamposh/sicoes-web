@@ -2,6 +2,7 @@ import puppeteer from "puppeteer";
 const fs = require("fs");
 const Captcha = require("2captcha-ts");
 const APIKEY = process.env.NEXT_PUBLIC_2CAPTCHA_API_KEY;
+const IS_DOCKER = process.env.NEXT_PUBLIC_DOCKER;
 const solver = new Captcha.Solver(APIKEY);
 
 const parseCuseId = (id) => {
@@ -31,10 +32,16 @@ export default async (req, res) => {
   const { cuceID} = req.body;
 
   try {
-    const browser = await puppeteer.launch({
-      headless: true,
-      slowMo: 1,
-    });
+    let chromeConf = {headless: true, slowMo: 1,}
+    console.log('IS_DOCKER', IS_DOCKER);
+    if(IS_DOCKER) {
+    chromeConf = {
+        headless: true,
+        executablePath: `/usr/bin/google-chrome`,
+        args: [`--no-sandbox`, `--headless`, `--disable-gpu`, `--disable-dev-shm-usage`],
+      }
+    }
+    const browser = await puppeteer.launch(chromeConf);
     const page = await browser.newPage();
     await page.goto("https://www.sicoes.gob.bo/portal/contrataciones/busqueda/convocatorias.php?tipo=convNacional");
     await page.setViewport({ width: 1080, height: 1024 });
@@ -45,7 +52,7 @@ export default async (req, res) => {
     const row = await page.$('.row');
     await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
     await page.waitForSelector('.cuce input[name="cuce1"]');
-    await page.click('label:nth-child(2) div ins'); //click on 'Solo vigentes' radio button
+    //await page.click('label:nth-child(2) div ins'); //click on 'Solo vigentes' radio button
     // consider if the option 'Todos' is selected there is the possible get other states like 'Desierto'
     
     if (cuceID) {
@@ -116,10 +123,8 @@ export default async (req, res) => {
         const find = "//td[contains(text(),'publicación')]";
         const result = document.evaluate(find, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         const date = result.parentElement.parentElement.children[1].children[0].innerText;
-        console.info('date ->>>>>>>>', date);
         return date;
       });
-      console.log('date>>>>>?????????', date);
       data[0].form170Date = date ? date : null;
       
     }
