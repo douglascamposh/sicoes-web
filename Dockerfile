@@ -1,9 +1,13 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 # Install dependencies only when needed
 FROM base AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
+RUN apt-get update && \
+    apt-get install -y libc6 && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
@@ -34,6 +38,7 @@ RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 WORKDIR /app
 
 ENV NODE_ENV production
@@ -42,6 +47,13 @@ ENV NODE_ENV production
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+RUN apt-get update && apt-get install -y gnupg wget && \
+  wget --quiet --output-document=- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google-archive.gpg && \
+  echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+  apt-get update && \
+  apt-get install -y google-chrome-stable --no-install-recommends && \
+  rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /app/public ./public
 

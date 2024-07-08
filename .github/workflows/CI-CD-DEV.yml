@@ -57,6 +57,8 @@ jobs:
         NEXT_PUBLIC_2CAPTCHA_API_KEY: ${{ secrets.CAPTCHA_API_KEY }}
       run: |
         touch .env.local
+        echo NEXT_PUBLIC_2CAPTCHA_API_KEY="$NEXT_PUBLIC_2CAPTCHA_API_KEY" >> .env.local
+        echo NEXT_PUBLIC_DOCKER=true >> .env.local
         echo "cat .env.local"
         cat .env.local
 
