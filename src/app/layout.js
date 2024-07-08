@@ -5,7 +5,7 @@ import { store } from "@/redux/store";
 import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import TopMenu from "@/components/topMenu";
+import TopMenu from "@/components/TopMenu";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={inter.className}>
         <Provider store={store}>
-            <TopMenu/>
+          <TopMenu/>
           <div className="pt-[20px] ">{children}</div>
           <ToastContainer />
         </Provider>
