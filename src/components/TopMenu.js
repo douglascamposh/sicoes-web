@@ -43,12 +43,25 @@ const TopMenu = () => {
     router.push('/');
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setUserEmail(null);
+    router.push('/sicoesitems');
+  }
+
+
   const optionRegisterButton = (
     <button onClick={handleRegister}>
       <span>register</span>
     </button>
-  )
+  );
 
+  const userOptionsButton = (
+    <button onClick={handleLogout}>
+      <span>Cerrar sesión</span>
+    </button>
+  );
+  const userOptionsButtonList = [userOptionsButton];
 
   const dataDropDownList = [optionRegisterButton];
   const textDropdown = "MenuDeplegable";
@@ -77,9 +90,7 @@ const TopMenu = () => {
             <ul>
               { userEmail ? (
                 <div className='relative hidden md:flex ml-10'>
-                  <NavItem key={userEmail} href={userEmail} onClick={handleSmallScreenNav}>
-                    {userEmail}
-                  </NavItem>
+                  <DropdownMenu dataDropdownList={userOptionsButtonList} textDropdown={userEmail} textColor="text-gray-700"></DropdownMenu>
                 </div>
               ) : (
                 <div className='relative hidden md:flex ml-10'>
