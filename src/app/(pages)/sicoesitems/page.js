@@ -15,27 +15,28 @@ import CachedIcon from '@mui/icons-material/Cached';
 import { toast } from 'react-toastify';
 import Title from "@/components/common/title";
 import DescriptionContent from "@/components/common/description";
+import { handleRequest } from "@/app/functions/utilities";
 
 const SicoesItems = () => {
     const headers = [
         {
             accessorKey: 'cuce',
             header: 'Cuce',
-            cell : ({row}) => (<DescriptionContent>{row.original.cuce}</DescriptionContent>)
+            cell: ({ row }) => (<DescriptionContent>{row.original.cuce}</DescriptionContent>)
         },
         {
             accessorKey: 'entity',
             header: 'Entidad',
-            cell : ({row}) => (<DescriptionContent>{row.original.entity}</DescriptionContent>)
+            cell: ({ row }) => (<DescriptionContent>{row.original.entity}</DescriptionContent>)
         },
         {
             accessorKey: 'contractDescription',
-            header: 'Tipo Contratación', cell : ({row}) => (<DescriptionContent>{row.original.contractDescription}</DescriptionContent>)
+            header: 'Tipo Contratación', cell: ({ row }) => (<DescriptionContent>{row.original.contractDescription}</DescriptionContent>)
         },
         {
             accessorKey: 'modality',
             header: 'Modalidad',
-            cell : ({row}) => (<DescriptionContent>{row.original.modality}</DescriptionContent>)
+            cell: ({ row }) => (<DescriptionContent>{row.original.modality}</DescriptionContent>)
         },
         {
             accessorKey: 'auction',
@@ -43,17 +44,17 @@ const SicoesItems = () => {
             meta: {
                 filterVariant: 'select',
             },
-            cell : ({row}) => (<DescriptionContent>{row.original.auction}</DescriptionContent>)
+            cell: ({ row }) => (<DescriptionContent>{row.original.auction}</DescriptionContent>)
         },
         {
             accessorKey: 'publishDateItem',
             header: 'Fecha de Publicación',
-            cell : ({row}) => (<DescriptionContent>{row.original.publishDateItem}</DescriptionContent>)
+            cell: ({ row }) => (<DescriptionContent>{row.original.publishDateItem}</DescriptionContent>)
         },
         {
             accessorKey: 'presentationDate',
             header: 'Fecha de Presentación',
-            cell : ({row}) => (<DescriptionContent>{row.original.presentationDate}</DescriptionContent>)
+            cell: ({ row }) => (<DescriptionContent>{row.original.presentationDate}</DescriptionContent>)
         },
         {
             accessorKey: 'form170Date',
@@ -63,7 +64,14 @@ const SicoesItems = () => {
         {
             accessorKey: 'stateAuction',
             header: 'Estado',
-            cell : ({row}) => (<DescriptionContent>{row.original.stateAuction}</DescriptionContent>)
+            cell: ({ row }) => (<DescriptionContent>{row.original.stateAuction}</DescriptionContent>)
+        },
+        {
+            accessorKey: 'entregaForm170',
+            header: 'entrega formulario 170',
+            cell: ({ row }) => {
+                return (<DescriptionContent>{row.original.presentationDate}</DescriptionContent>)
+            }
         },
         {
             accessorKey: 'refresh',
@@ -95,7 +103,6 @@ const SicoesItems = () => {
         },
     ];
 
-
     const sicoesDataFields = [
         { label: 'CUCE', key: 'cuce' },
         { label: 'Entidad', key: 'entity' },
@@ -110,7 +117,6 @@ const SicoesItems = () => {
         { label: 'Archivos', key: 'Archivos' },
         { label: 'Formularios', key: 'Formularios' },
     ];
-
 
     const dispatch = useDispatch();
     const page = useSelector(state => state.pagination.page);
@@ -128,14 +134,16 @@ const SicoesItems = () => {
 
     const titleModal = "AGREGAR NUEVO SICOES ITEM";
     const titleModalDelete = "ELIMINAR SICOES ITEM";
-    const titleTable = "Búsqueda de Procesos de Contrataciones Nacionales"
+    const titleTable = "Búsqueda de Procesos de Contrataciones Nacionales";
+    const disabledSubmit = Object.keys(dataSicoes).length === 0;
+
     //add when we have limit
     const { data: itemsSicoesData, refetch: refetchItems } = useGetItemsQuery({
         page: page,
         search: search,
         //limit
     });
-
+ 
     useEffect(() => {
         if (itemsSicoesData) {
             setData(transformData(itemsSicoesData.content));
@@ -173,62 +181,46 @@ const SicoesItems = () => {
     }
 
     const handlerefresh = async (row) => {
-        try {
             setIsRefreshing({ [row.original.id]: true });
-            const response = await fetch('/api/recruitments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    cuceID: row.original.cuce.trim(),
-                }),
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                const itemToUpdate = {
-                    id: row.original.id,
-                    ...Object(result.data[0]),
-                };
-                await editItem({ id: row.original.id, item: transformedItem(itemToUpdate) });
-                toast.success("Item Actualizado correctamente",{
-                    position : "bottom-right"
-                })
-                setIsRefreshing({ [row.original.id]: false });
-            } else {
-                setIsRefreshing({ [row.original.id]: false });
-                toast.error("Error al actualizar el item",{
-                    position : "bottom-right"
-                })
-            }
-        } catch (error) {
-            setIsRefreshing({ [row.original.id]: false });
-        }
+            handleRequest('refresh', { row }, {
+                onSuccess: (result) => {
+                  toast.success('Item actualizado correctamente',{
+                    position: "bottom-right",
+                });
+                  setIsRefreshing({ [row.original.id]: false });
+                },
+                onError: (error) => {
+                  toast.error('Error al actualizar el item',{
+                    position: "bottom-right",
+                });
+                  setIsRefreshing({ [row.original.id]: false });
+                },
+              });
     };
 
     const handleSearchItem = async (values) => {
-        setIsLoading(true);
-        try {
-            const response = await fetch('/api/recruitments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    cuceID: values.newCuce.trim(),
-                }),
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                setDataSicoes(Object(result.data[0]));
-            } else {
-                //TODO show in the UI try again or something like that
-                console.error('Error al obtener los datos');
+       setIsLoading(true);
+       handleRequest('search',{values},{
+        onSuccess: (result) => {
+            if (result.data[0]){
+                setDataSicoes(result.data[0]);
+                setIsLoading(false);
+                toast.success('Item Encontrado correctamente',{
+                    position: "bottom-right",
+                });
+            }else {
+                setIsLoading(false);
+                toast.error('Item No válido',{
+                    position: "bottom-right",
+                });  
             }
-        } catch (error) {
-            console.error('Network error:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+        },
+        onError: (error) => {
+          setIsLoading(false);
+          toast.error(error);
+        },
+       }) 
+    }
 
     const handleNewItemSubmit = async () => {
         try {
@@ -255,29 +247,30 @@ const SicoesItems = () => {
 
     const handleDeleteItems = async () => {
         try {
-          const response = await deleteItem(selectedItemToDelete);
-          if (response.error.originalStatus === 200) {
-            refetchItems();
-            setShowModalDelete(false);
-            setSelectedItemToDelete(null);
-            toast.success("Item eliminado exitosamente", {
-              position: "bottom-right",
-            });
-          } else {
-            toast.error("Error al eliminar el elemento",{
-                position : "bottom-right"
-            });
-          }
+            const response = await deleteItem(selectedItemToDelete);
+            if (response.error.originalStatus === 200) {
+                refetchItems();
+                setShowModalDelete(false);
+                setSelectedItemToDelete(null);
+                toast.success("Item eliminado exitosamente", {
+                    position: "bottom-right",
+                });
+            } else {
+                toast.error("Error al eliminar el elemento", {
+                    position: "bottom-right"
+                });
+            }
         } catch (error) {
-          console.error('Error al eliminar el ítem:', error.message);
-          toast.error("Error al eliminar el elemento",{
-            position : "bottom-right"
-        });
+            console.error('Error al eliminar el ítem:', error.message);
+            toast.error("Error al eliminar el elemento", {
+                position: "bottom-right"
+            });
         }
-      };
+    };
+
     return (
-        <div className="w-full mx-auto max-w-screen-2xl p-4 mt-8 bg-white rounded-lg shadow-lg shadow-blue-900">
-             <Title className="text-center">
+        <div className="w-full mx-auto max-w-screen-2xl p-5 mr-10 bg-white rounded-lg shadow-lg shadow-blue-900">
+            <Title className="text-center">
                 <h1 className="text-blue-500 text-xl">{titleTable}</h1>
             </Title>
             <div className="flex justify-end">
@@ -288,7 +281,7 @@ const SicoesItems = () => {
                 >
                     <AddIcon className="text-lg mr-2" />
                     <Title>
-                        <h1 className="text-white">{"Registrar Cuce"}</h1>
+                        <h1 className="text-white">Registrar Cuce</h1>
                     </Title>
                 </button>
             </div>
@@ -302,6 +295,8 @@ const SicoesItems = () => {
                     handleNewItemSubmit={handleNewItemSubmit}
                     submitButtonText="Agregar"
                     cancelButtonText="Cancelar"
+                    existDataSicoes={dataSicoes}
+                    disableSubmit={disabledSubmit}
                 >
                     <FormNewItem onSubmit={handleSearchItem} isLoading={isLoading} />
                     <SicoesData dataSicoes={dataSicoes} sicoesDataFields={sicoesDataFields} />
@@ -315,11 +310,12 @@ const SicoesItems = () => {
                     handleNewItemSubmit={handleDeleteItems}
                     submitButtonText="Eliminar"
                     cancelButtonText="Cancelar"
+                    disableSubmit={false}
                 >
                     <h1>¿Seguro que quieres eliminar este Item?</h1>
                 </ModalCuce>
             </div>
-            <Table className="my-10 mt-22 mx-4"
+            <Table className=""
                 columns={headers}
                 data={data}
                 handleNextPage={handleNextPage}

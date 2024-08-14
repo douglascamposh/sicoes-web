@@ -8,7 +8,7 @@ const solver = new Captcha.Solver(APIKEY);
 const parseCuseId = (id) => {
   const cuce = id.split("-");
   return cuce;
-}
+};
 
 const getCaptchaAnswer = async (imgPath) => {
   try {
@@ -23,13 +23,23 @@ const getCaptchaAnswer = async (imgPath) => {
   }
 };
 
+const validateCuceID = (cuceID) => {
+  const format1 = /^\d+$/;
+  const format2 = /^\d{2}-\d{4}-\d{2}-\d{7}-\d{1}-\d{1}$/;
+  return format1.test(cuceID) || format2.test(cuceID);
+};
+
 export default async (req, res) => {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { cuceID} = req.body;
+  const { cuceID } = req.body;
+  
+  if (!validateCuceID(cuceID)) {
+    return res.status(400).json({ error: 'Invalid cuce ID' });
+  }
 
   try {
     let chromeConf = {headless: true, slowMo: 1,}
@@ -108,7 +118,8 @@ export default async (req, res) => {
     if(data && data.length > 0 && data[0].displayCaptcha) {
       await page.waitForSelector('#modal-download', { visible: true });
       const img = await page.$('#captchasp img');
-      const imgUrl = await page.$eval('#captchasp img', img => img.src);
+      const imgUrl = "" + Date.now(); //await page.$eval('#captchasp img', img => img.src);
+
       const path = './public/' + imgUrl.split('/').pop();
       await img.screenshot({ path: path });
       const captchaResponse = await getCaptchaAnswer(path);
@@ -132,7 +143,7 @@ export default async (req, res) => {
     await browser.close();
     return res.status(200).json({ message: "Success", data });
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     return res.status(500).json({ error: error });
   }
 }

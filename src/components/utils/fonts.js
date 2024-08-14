@@ -5,7 +5,7 @@ export const fontTitleMonserrat = Montserrat({
     weight: ['300', '500'],
   });
 
-export const fontBody = Montserrat ({
+export const fontBodyMonserrat = Montserrat ({
     subsets: ['latin', 'cyrillic'],
     weight: ['300', '500'],
 });
