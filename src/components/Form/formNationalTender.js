@@ -17,48 +17,48 @@ const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
         >
             {() => (
                 <Form className="flex flex-col space-y-4">
-                    <div className="flex flex-col lg:flex-row space-y-2 lg:space-x-2">
-                        <div className="flex items-center">
-                            <label htmlFor="publicacionDesde" className="font-semibold text-gray-800">
+                    <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                        <div className="flex items-center space-x-2">
+                            <label htmlFor="publicacionDesde" className="font-semibold text-gray-800 text-sm">
                                 <Title>{"Publicación Desde:"}</Title>
                             </label>
                             <Field
                                 type="date"
-                                className="py-1 border rounded border-gray-300 w-full sm:w-auto ml-1"
+                                className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                 id="publicacionDesde"
                                 name="publicacionDesde"
                             />
-                            <Title className="mr-1 ml-1">{"Y"}</Title>
+                            <span><Title>{"Y"}</Title></span>
                             <Field
                                 type="date"
-                                className="py-1 border rounded w-full sm:w-auto border-gray-300  ml-0.5"
+                                className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                 id="publicacionHasta"
                                 name="publicacionHasta"
                             />
                         </div>
-                        <div className="flex items-center">
-                            <label htmlFor="presentacionDesde" className="font-semibold text-gray-800">
-                                <Title className="">{"Presentación Desde:"}</Title>
+                        <div className="flex items-center space-x-2">
+                            <label htmlFor="presentacionDesde" className="font-semibold text-gray-800 text-sm">
+                                <Title>{"Presentación Desde:"}</Title>
                             </label>
                             <Field
                                 type="date"
-                                className="py-1 border rounded w-full sm:w-auto border-gray-300  ml-1"
+                                className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                 id="presentacionDesde"
                                 name="presentacionDesde"
                             />
-                            <Title className="mr-1 ml-1">{"Y"}</Title>
+                            <span><Title>{"Y"}</Title></span>
                             <Field
                                 type="date"
-                                className="py-1 border rounded w-full sm:w-auto border-gray-300"
+                                className="px-1 py-1 border rounded border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                                 id="presentacionHasta"
                                 name="presentacionHasta"
                             />
                         </div>
                     </div>
-                    <div className="flex items-center justify-center">
-                        <div className="flex flex-col items-center w-full md:w-auto">
-                            <div className="flex bg-white border border-blue-700 text-gray-600 text-sm rounded-lg focus:border-blue-700 p-1.5 dark:bg-blue-100 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:border-blue-700">
-                                <Search className="w-4 h-4 text-blue-700 mr-2 mt-1" />
+                    <div className="flex flex-col md:flex-row items-center justify-center">
+                        <div className="flex items-center w-full md:w-auto">
+                            <div className="flex-grow bg-white border border-blue-700 text-gray-600 text-sm rounded-lg focus:border-blue-700 p-1.5 dark:bg-blue-100 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:border-blue-700 pl-10">
+                                <Search className="w-4 h-4 text-blue-700 mr-2" />
                                 <Field
                                     type="text"
                                     className="flex-grow bg-transparent outline-none md:text-sm p-0.5 md:p-0.5"
@@ -68,10 +68,10 @@ const FormNationalTender = ({ onSubmit, onNewItemClick }) => {
                                 />
                             </div>
                         </div>
-                        <button type="submit" className="p-2  ms-2 md:ms-4 text-base md:text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-300 hover:text-blue-700">
-                            <Title>
-                                <div className='text-white'>Buscar</div>
-                            </Title>
+                        <button type="submit"className="p-2  ms-2 md:ms-4 text-base md:text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-300 hover:text-blue-700">
+                        <Title>
+                            <div className='text-white'>{"Buscar"}</div>
+                        </Title>
                         </button>
                     </div>
                 </Form>

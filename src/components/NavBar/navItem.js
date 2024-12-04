@@ -5,7 +5,7 @@ import Title from '../common/title';
 const NavItem = ({ href, children, onClick, className }) => (
   <li onClick={onClick} className={`mr-8 text-sm cursor-pointer ${className}`}>
     <Link href={href}>
-      <Title className={className}>{children}</Title>
+      <Title>{children}</Title>
     </Link>
   </li>
 );

@@ -1,13 +1,12 @@
-import { ROW_STYLES } from "../constants/styles";
 import moment from 'moment';
 
 const FORMAT_DATE_SICOES = 'DD/MM/YYYY HH:mm:ss'; 
 // correct this format
-  export const convertDateToMiliSeconds = (date) => {
+export const convertDateToMiliSeconds = (date) => {
     const [day, month, year] = date.split("/");
     const formattedDate = `${month}/${day}/${year}`;
-    return new Date(formattedDate).getTime();
-  }
+    return new Date(formattedDate).getTime() / 1000;
+}
 
 export const dateStrToSeconds = (dateStr) => {
     const momentObj = moment(dateStr, FORMAT_DATE_SICOES);
@@ -28,26 +27,26 @@ export const newItemObject = (obj) => {
         form170Date: dateStrToSeconds(obj.form170Date),
         awardDate: 0,
     }
-  }
+}
 
-  export const convertMiliSecondsToDate = (miliSeconds) => {
-    const date = new Date(miliSeconds);
+export const convertMiliSecondsToDate = (miliSeconds) => {
+    const date = new Date(miliSeconds * 1000);
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
-  }
+}
 
-  export const convertBooleanToString = (dataBoolean) => {
+export const convertBooleanToString = (dataBoolean) => {
      return dataBoolean? "Si" : "No";
-  }
+}
 
-  export const convertStringToBoolean = (dataString) => {
+export const convertStringToBoolean = (dataString) => {
     return dataString == "Si"? true : false;
-  }
+}
 
-  export const transformData = (data) => {
-   const adaptData = data.map((d) => {
+export const transformData = (data) => {
+  const adaptData = data.map((d) => {
             return {
                 id : d.id,
                 cuce: d.cuce || '',
@@ -59,15 +58,14 @@ export const newItemObject = (obj) => {
                 stateAuction: d.stateAuction || 0,
                 publishDateItem: convertMiliSecondsToDate(d.publishDateItem) || 0,
                 presentationDate: convertMiliSecondsToDate(d.presentationDate) || 0,
-                form170Date: null,
                 awardDate: convertMiliSecondsToDate(d.awardDate ) || 0,
             }
       
-    })
-    return adaptData;
-  }
+  })
+  return adaptData;
+}
 
-  export const transformedItem = (obj) => {
+export const transformedItem = (obj) => {
     return {
         id: obj.id || '',
         cuce: obj.cuce || '',
@@ -79,20 +77,8 @@ export const newItemObject = (obj) => {
         stateAuction: obj.stateAuction || 0,
         publishDateItem: convertDateToMiliSeconds(obj.presentationDate) || 0,
         presentationDate: convertDateToMiliSeconds(obj.publishDateItem) || 0,
-        form170Date: null,
         awardDate: 0,
     }
-  }
+}
 
-  export const convertMilisecondsToDays = (miliseconds) => {
-    return Math.ceil(miliseconds /(1000 * 60 * 60 * 24));
-  }
 
-  export const getRowStyle = (rowDate) => {
-    const now = new Date().getTime();
-    const targetDate  = convertDateToMiliSeconds(rowDate);
-    const differenceInMiliseconds = targetDate - now;
-    const differenceInDays = convertMilisecondsToDays(differenceInMiliseconds);
-    return (differenceInDays === 1 || differenceInDays === 2 || differenceInDays ===0) ? ROW_STYLES.YELLOW 
-    : (differenceInDays < 0) ? ROW_STYLES.GRAY : ROW_STYLES.DEFAULT;
-  }

@@ -44,17 +44,6 @@ export const itemsApi = createApi({
         body: item,
       }),
     }),
-    getItemsForUpdate : builder.query({
-      query: (params) => ({
-        url: '/items',
-        params: {
-          page: params.page,
-          //search  : params.search
-          //limit : 10,
-        }
-      }),
-      providesTags : ['Items'],
-    }),
   }),
 });
 
@@ -63,5 +52,4 @@ export const {
   usePostItemMutation,
   useDeleteItemMutation,
   useEditItemMutation,
-  useGetItemsForUpdateQuery
 } = itemsApi;

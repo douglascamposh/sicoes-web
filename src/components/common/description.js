@@ -1,13 +1,14 @@
 import React from 'react'
-import { fontBodyMonserrat } from '../utils/fonts';
+import { fontBody } from '../utils/fonts';
 
-const descrition = fontBodyMonserrat;
+const descrition = fontBody;
 
- const DescriptionContent = ({ children, className}) => ( 
-    <div className={`${descrition.className} text-black text-xs ${className}`}>
+ const DescriptionContent = ({ children, className}) => {
+  return ( 
+    <div className={`${descrition.className} ${className} text-black text-xs`}>
         {children}
     </div>
   )
-
+}
 
 export default DescriptionContent;

@@ -3,7 +3,8 @@ import React from 'react';
 import Title from './common/title';
 import DescriptionContent from './common/description';
 
-const SicoesData = ({ dataSicoes, sicoesDataFields }) => (
+const SicoesData = ({ dataSicoes, sicoesDataFields }) => {
+    return (
         <div>
             <h1 className="text-base font-bold mb-2"><Title>{"Datos Sicoes"}</Title></h1>
             <div className="grid grid-cols-2 gap-3">
@@ -16,5 +17,6 @@ const SicoesData = ({ dataSicoes, sicoesDataFields }) => (
             </div>
         </div>
     );
+};
 
 export default SicoesData;
