@@ -8,7 +8,7 @@ const solver = new Captcha.Solver(APIKEY);
 const parseCuseId = (id) => {
   const cuce = id.split("-");
   return cuce;
-};
+}
 
 const getCaptchaAnswer = async (imgPath) => {
   try {
@@ -23,26 +23,16 @@ const getCaptchaAnswer = async (imgPath) => {
   }
 };
 
-const validateCuceID = (cuceID) => {
-  const format1 = /^\d+$/;
-  const format2 = /^\d{2}-\d{4}-\d{2}-\d{7}-\d{1}-\d{1}$/;
-  return format1.test(cuceID) || format2.test(cuceID);
-};
-
- const hableRequestRecruitments = async (req, res) => {
+export default async (req, res) => {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { cuceID } = req.body;
-  
-  if (!validateCuceID(cuceID)) {
-    return res.status(400).json({ error: 'Invalid cuce ID' });
-  }
+  const { cuceID} = req.body;
 
   try {
-    let chromeConf = {headless: true, slowMo: 1}
+    let chromeConf = {headless: true, slowMo: 1,}
     console.log('IS_DOCKER', IS_DOCKER);
     if(IS_DOCKER) {
     chromeConf = {
@@ -51,19 +41,16 @@ const validateCuceID = (cuceID) => {
         args: [`--no-sandbox`, `--headless`, `--disable-gpu`, `--disable-dev-shm-usage`],
       }
     }
-
     const browser = await puppeteer.launch(chromeConf);
     const page = await browser.newPage();
     await page.goto("https://www.sicoes.gob.bo/portal/contrataciones/busqueda/convocatorias.php?tipo=convNacional");
     await page.setViewport({ width: 1080, height: 1024 });
 
     await page.waitForSelector('#modalComunicados', { visible: true });
-    await page.click('#modalComunicados > div > div > div.modal-header > button > span');
-
+    await page.click('#modalComunicados .close span');
     await page.waitForSelector('.row');
     const row = await page.$('.row');
-    await row.$eval('body > div > div.container > div.banner-bottom-grids > div.row > div.col-md-8.banner-bottom-grid-left > a.col-md-6.col-xs-6.col-sm-6.servc-grid.servicioSICOES > div.servc-grid-right.blog > h4', el => el.click());
-    //await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
+    await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
     await page.waitForSelector('.cuce input[name="cuce1"]');
     //await page.click('label:nth-child(2) div ins'); //click on 'Solo vigentes' radio button
     // consider if the option 'Todos' is selected there is the possible get other states like 'Desierto'
@@ -121,8 +108,7 @@ const validateCuceID = (cuceID) => {
     if(data && data.length > 0 && data[0].displayCaptcha) {
       await page.waitForSelector('#modal-download', { visible: true });
       const img = await page.$('#captchasp img');
-      const imgUrl = "" + Date.now(); //await page.$eval('#captchasp img', img => img.src);
-
+      const imgUrl = await page.$eval('#captchasp img', img => img.src);
       const path = './public/' + imgUrl.split('/').pop();
       await img.screenshot({ path: path });
       const captchaResponse = await getCaptchaAnswer(path);
@@ -139,7 +125,6 @@ const validateCuceID = (cuceID) => {
         const date = result.parentElement.parentElement.children[1].children[0].innerText;
         return date;
       });
-      console.log("mis datos" , data);
       data[0].form170Date = date ? date : null;
       
     }
@@ -147,8 +132,7 @@ const validateCuceID = (cuceID) => {
     await browser.close();
     return res.status(200).json({ message: "Success", data });
   } catch (error) {
-    //console.error(error);
+    console.error(error);
     return res.status(500).json({ error: error });
   }
 }
-export default hableRequestRecruitments;

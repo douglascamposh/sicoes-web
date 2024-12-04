@@ -62,11 +62,12 @@ const TopMenu = () => {
     </button>
   );
   const userOptionsButtonList = [userOptionsButton];
+
   const dataDropDownList = [optionRegisterButton];
   const textDropdown = "MenuDeplegable";
 
   return (
-    <header className='bg-white w-full ease-in duration-300 fixed top-0 z-50 shadow-md py-4'>
+    <header className='bg-white shadow-md py-4'>
       <nav className='container mx-auto px-4 flex justify-between items-center'>
         <div>
           <Link href="/">
@@ -109,7 +110,7 @@ const TopMenu = () => {
           <ul className="font-bold text-2xl flex flex-col w-full">
             {navItems.map(({ href, label }) => (
               <div key={href} className="mr-[30px] ml-10">
-                <NavItem href={href}  onClick={handleSmallScreenNav} className="text-white">
+                <NavItem href={href} onClick={handleSmallScreenNav}>
                   {label}
                 </NavItem>
                 <div className="border-b border-white mb-6 w-full"></div>
@@ -118,7 +119,6 @@ const TopMenu = () => {
           </ul>
           <div className='mr-[30px] ml-10'>
             <MobileDropdown
-              className='text-white'
               dataDropdownList={dataDropDownList}
               textDropdown={textDropdown}
               isOpen={isOpenMovileDropDown}

@@ -19,8 +19,8 @@ export default function RootLayout({ children }) {
       </head>
       <body className={inter.className}>
         <Provider store={store}>
-            <TopMenu/>
-          <div className="pt-[90px] ">{children}</div>
+          <TopMenu/>
+          <div className="pt-[20px] ">{children}</div>
           <ToastContainer />
         </Provider>
       </body>

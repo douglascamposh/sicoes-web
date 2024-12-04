@@ -3,7 +3,8 @@ import { Search, Add } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
 import Title from '../common/title';
 
-const FormNewItem = ({ onSubmit, onClose, isLoading }) => (
+const FormNewItem = ({ onSubmit, onClose, isLoading }) => {
+    return (
         <Formik
             initialValues={{ newCuce: '' }}
             onSubmit={(values) => {
@@ -45,6 +46,6 @@ const FormNewItem = ({ onSubmit, onClose, isLoading }) => (
             )}
         </Formik>
     );
-
+};
 
 export default FormNewItem;
