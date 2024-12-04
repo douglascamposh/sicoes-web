@@ -1,22 +1,23 @@
 'use client'
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect} from "react";
 import Table from "@/components/table";
 import FormNationalTender from "@/components/Form/formNationalTender";
 import ModalCuce from "@/components/modalCuce";
 import FormNewItem from "@/components/Form/newItem";
 import SicoesData from "@/components/sicoesData";
-import { usePostItemMutation, useGetItemsQuery, useDeleteItemMutation, useEditItemMutation } from "@/redux/services/itemsApi";
+import { usePostItemMutation, useGetItemsQuery, useDeleteItemMutation, useEditItemMutation, useGetItemsForUpdateQuery } from "@/redux/services/itemsApi";
 import AddIcon from '@mui/icons-material/Add';
 import { transformData, newItemObject, transformedItem } from "@/app/functions/utilities";
 import { useDispatch, useSelector } from "react-redux";
-import { nextPage, prevPage, firsPage, lastPage, searchCuce, anyPage } from "@/redux/slice/paginationSlice";
+import { nextPage, prevPage, firsPage, lastPage, searchCuce, anyPage, nextPageForUpdate, resetPageForUpdate, setPageForUpdate} from "@/redux/slice/paginationSlice";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CachedIcon from '@mui/icons-material/Cached';
 import { toast } from 'react-toastify';
 import Title from "@/components/common/title";
 import DescriptionContent from "@/components/common/description";
-import { handleRequest } from "@/app/functions/utilities";
-
+import { handleRequest , processResponse, sendRequest} from "@/app/functions/puppeteerUtils";
+import UpdateIcon from '@mui/icons-material/Update';
+import Loading from "@/components/loading";
 const SicoesItems = () => {
     const headers = [
         {
@@ -120,6 +121,7 @@ const SicoesItems = () => {
 
     const dispatch = useDispatch();
     const page = useSelector(state => state.pagination.page);
+    const pageForUpdateTalble = useSelector( state => state.pagination.pageForUpdateTalble);
     const search = useSelector(state => state.pagination.search);
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -131,24 +133,62 @@ const SicoesItems = () => {
     const [postItem] = usePostItemMutation();
     const [deleteItem] = useDeleteItemMutation();
     const [editItem] = useEditItemMutation();
-
+    const [showUpdate, setShowUpdate] = useState(false);
+   
     const titleModal = "AGREGAR NUEVO SICOES ITEM";
     const titleModalDelete = "ELIMINAR SICOES ITEM";
     const titleTable = "Búsqueda de Procesos de Contrataciones Nacionales";
     const disabledSubmit = Object.keys(dataSicoes).length === 0;
-
+     
     //add when we have limit
-    const { data: itemsSicoesData, refetch: refetchItems } = useGetItemsQuery({
+    const { data: itemsSicoesData, refetch: refetchItems, isLoading: isloadingItemsSicoes } = useGetItemsQuery({
         page: page,
         search: search,
         //limit
     });
- 
+
+    const { data : dataUpdateTabla } = useGetItemsForUpdateQuery({
+        page : pageForUpdateTalble,
+    });
+    
+    useEffect(() => {
+        if (showUpdate) { 
+         if (dataUpdateTabla && dataUpdateTabla.content && dataUpdateTabla.content.length > 0) {
+          const promises =  dataUpdateTabla.content.map(async (item) => {
+                   await sendRequest(item.cuce)
+                   .then(processResponse)
+                   .then( async (response) => {
+                     if (response.data && response) {
+                          let newItem = response.data[0];
+                          newItem.id = item.id;
+                          await editItem({id: newItem.id, item:transformedItem(newItem) })
+                     }
+                   }).catch((error) => console.log(error));
+            });
+           Promise.all(promises)
+           .then(() => {
+             dispatch(nextPageForUpdate());
+           })
+           .catch((error) => console.log(error))
+           .finally(() => {
+            setShowUpdate(false);
+           })
+        }
+    }
+    },[dataUpdateTabla,dispatch, showUpdate, editItem]);
+
     useEffect(() => {
         if (itemsSicoesData) {
             setData(transformData(itemsSicoesData.content));
         }
     }, [itemsSicoesData]);
+
+    if (isloadingItemsSicoes) return <Loading />;
+
+    const handleUpdateAllTable = async () => {
+        setShowUpdate(true);
+        dispatch(setPageForUpdate(null));
+      }
 
     const handleNextPage = () => {
         dispatch(nextPage());
@@ -179,11 +219,12 @@ const SicoesItems = () => {
         dispatch(anyPage(page));
         refetchItems();
     }
-
+   
     const handlerefresh = async (row) => {
             setIsRefreshing({ [row.original.id]: true });
             handleRequest('refresh', { row }, {
                 onSuccess: (result) => {
+                 // await editItem({ row.original.id, })
                   toast.success('Item actualizado correctamente',{
                     position: "bottom-right",
                 });
@@ -267,22 +308,28 @@ const SicoesItems = () => {
             });
         }
     };
-
+    
     return (
-        <div className="w-full mx-auto max-w-screen-2xl p-5 mr-10 bg-white rounded-lg shadow-lg shadow-blue-900">
+        <div className="w-full p-2 rounded-lg shadow-lg shadow-blue-900">
             <Title className="text-center">
                 <h1 className="text-blue-500 text-xl">{titleTable}</h1>
             </Title>
-            <div className="flex justify-end">
+            <div className="flex justify-between">
                 <button
                     type="button"
                     className="flex items-end px-3 py-2 bg-blue-700 text-white hover:bg-blue-600  transition-colors duration-300 text-sm "
                     onClick={() => setShowModal(true)}
                 >
                     <AddIcon className="text-lg mr-2" />
-                    <Title>
-                        <h1 className="text-white">Registrar Cuce</h1>
-                    </Title>
+                    <Title className="text-white">Registrar Cuce</Title>
+                </button>
+                <button 
+                   type="button"
+                   className="flex items-end px-3 py-2 bg-blue-700 text-white hover:bg-blue-600  transition-colors duration-300 text-sm"
+                   onClick={handleUpdateAllTable}
+                   >
+                    <UpdateIcon className={ !showUpdate? "text-lg mr-2" : "inlinetext-gray-200 animate-spin mr-1 mt-1"}/>
+                    <Title className="text-white">Actualizar tabla</Title>
                 </button>
             </div>
             <div className="h-0.5 bg-blue-700 mb-4"></div>

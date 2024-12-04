@@ -29,7 +29,7 @@ const validateCuceID = (cuceID) => {
   return format1.test(cuceID) || format2.test(cuceID);
 };
 
-export default async (req, res) => {
+ const hableRequestRecruitments = async (req, res) => {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -42,7 +42,7 @@ export default async (req, res) => {
   }
 
   try {
-    let chromeConf = {headless: true, slowMo: 1,}
+    let chromeConf = {headless: true, slowMo: 1}
     console.log('IS_DOCKER', IS_DOCKER);
     if(IS_DOCKER) {
     chromeConf = {
@@ -51,16 +51,19 @@ export default async (req, res) => {
         args: [`--no-sandbox`, `--headless`, `--disable-gpu`, `--disable-dev-shm-usage`],
       }
     }
+
     const browser = await puppeteer.launch(chromeConf);
     const page = await browser.newPage();
     await page.goto("https://www.sicoes.gob.bo/portal/contrataciones/busqueda/convocatorias.php?tipo=convNacional");
     await page.setViewport({ width: 1080, height: 1024 });
 
     await page.waitForSelector('#modalComunicados', { visible: true });
-    await page.click('#modalComunicados .close span');
+    await page.click('#modalComunicados > div > div > div.modal-header > button > span');
+
     await page.waitForSelector('.row');
     const row = await page.$('.row');
-    await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
+    await row.$eval('body > div > div.container > div.banner-bottom-grids > div.row > div.col-md-8.banner-bottom-grid-left > a.col-md-6.col-xs-6.col-sm-6.servc-grid.servicioSICOES > div.servc-grid-right.blog > h4', el => el.click());
+    //await row.$eval('[data-content="Búsqueda de Procesos de Contrataciones Nacionales"]', el => el.click());
     await page.waitForSelector('.cuce input[name="cuce1"]');
     //await page.click('label:nth-child(2) div ins'); //click on 'Solo vigentes' radio button
     // consider if the option 'Todos' is selected there is the possible get other states like 'Desierto'
@@ -136,6 +139,7 @@ export default async (req, res) => {
         const date = result.parentElement.parentElement.children[1].children[0].innerText;
         return date;
       });
+      console.log("mis datos" , data);
       data[0].form170Date = date ? date : null;
       
     }
@@ -147,3 +151,4 @@ export default async (req, res) => {
     return res.status(500).json({ error: error });
   }
 }
+export default hableRequestRecruitments;

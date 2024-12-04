@@ -31,7 +31,7 @@ export const newItemObject = (obj) => {
   }
 
   export const convertMiliSecondsToDate = (miliSeconds) => {
-    const date = new Date(miliSeconds * 1000);
+    const date = new Date(miliSeconds);
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
@@ -59,6 +59,7 @@ export const newItemObject = (obj) => {
                 stateAuction: d.stateAuction || 0,
                 publishDateItem: convertMiliSecondsToDate(d.publishDateItem) || 0,
                 presentationDate: convertMiliSecondsToDate(d.presentationDate) || 0,
+                form170Date: null,
                 awardDate: convertMiliSecondsToDate(d.awardDate ) || 0,
             }
       
@@ -78,6 +79,7 @@ export const newItemObject = (obj) => {
         stateAuction: obj.stateAuction || 0,
         publishDateItem: convertDateToMiliSeconds(obj.presentationDate) || 0,
         presentationDate: convertDateToMiliSeconds(obj.publishDateItem) || 0,
+        form170Date: null,
         awardDate: 0,
     }
   }
@@ -93,42 +95,4 @@ export const newItemObject = (obj) => {
     const differenceInDays = convertMilisecondsToDays(differenceInMiliseconds);
     return (differenceInDays === 1 || differenceInDays === 2 || differenceInDays ===0) ? ROW_STYLES.YELLOW 
     : (differenceInDays < 0) ? ROW_STYLES.GRAY : ROW_STYLES.DEFAULT;
-  }
-
-  export const handleRequest = async (action, data = {}, callbacks = {}) => {
-    const { onSuccess = () => {}, onError = () => {} } = callbacks;
-    try {
-     const response = await  performAction(action, data);
-      
-      if (response.ok) {
-         const result = await response.json();
-         onSuccess(result);
-      }else {
-        onError("Error al buscar el item")
-      }
-
-    }catch (err) {
-      onError(err);
-    }
-  }
-  
-  const performAction = async (action, data) => {
-    const baseUrl = '/api/recruitments'; 
-    switch (action) {
-       case 'refresh':
-          return await fetch(baseUrl, {
-            method : 'POST',
-            headers: { 'Content-type' : 'application/json' },
-            body: JSON.stringify({cuceID: data.row.original.cuce.trim() }),
-          });
-       case 'search':
-          return await fetch(baseUrl, {
-            method : 'POST',
-            headers: { 'Content-type' : 'application/json' },
-            body: JSON.stringify({ cuceID: data.values.newCuce.trim() }),
-          });
-       default :
-         "error al poner la accion ??";
-
-    }
   }

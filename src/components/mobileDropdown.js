@@ -15,8 +15,8 @@ const MobileDropdown = ({ dataDropdownList, textDropdown, isOpen, toggleDropdown
                 </Button>
             <div className="border-b border-white mb-6 w-full"></div>
             {isOpen && (
-                <div className="">
-                   
+                <div className="ml-2">
+                   {dataDropdownList.map((item) => item)}
                 </div>
             )}
         </div>
