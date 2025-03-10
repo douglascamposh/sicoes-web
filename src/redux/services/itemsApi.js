@@ -1,59 +1,59 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const NEXT_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const itemsApi = createApi({
-  reducerPath: 'itemsApi',
+  reducerPath: "itemsApi",
   baseQuery: fetchBaseQuery({
     baseUrl: `${NEXT_BASE_URL}/api/v1`,
   }),
-  tagTypes: ['Items'],
+  tagTypes: ["Items"],
   endpoints: (builder) => ({
 
     getItems: builder.query({
-      query: (params) => ({
-        url: '/items',
+      query: ({ page, search, auction }) => ({
+        url: "/items",
         params: {
-          page: params.page,
-          search  : params.search
-          //limit : 10,
-        }
+          page,
+          search,
+          ...(auction !== null && { auction })
+      },
       }),
-      providesTags : ['Items'],
+      providesTags : ["Items"],
     }),
     postItem: builder.mutation({
       query: (item) => ({
-        method: 'POST',
-        url: '/items',
+        method: "POST",
+        url: "/items",
         body: item,
       }),
-      //invalidatesTags: ['Items'],
+      //invalidatesTags: ["Items"],
     }),
 
     deleteItem : builder.mutation({
       query: (id) => ({
-        method: 'DELETE',
+        method: "DELETE",
         url: `/items/${id}`,
       }),
-     // invalidatesTags: ['Items'],
+     // invalidatesTags: ["Items"],
     }),
     editItem: builder.mutation({
       query: ({ id, item }) => ({
-        method: 'PUT',
+        method: "PUT",
         url: `/items/${id}`,
         body: item,
       }),
     }),
     getItemsForUpdate : builder.query({
       query: (params) => ({
-        url: '/items',
+        url: "/items",
         params: {
           page: params.page,
           //search  : params.search
           //limit : 10,
         }
       }),
-      providesTags : ['Items'],
+      providesTags : ["Items"],
     }),
   }),
 });

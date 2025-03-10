@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import React, { useState, useEffect} from "react";
 import Table from "@/components/table";
 import FormNationalTender from "@/components/Form/formNationalTender";
@@ -6,92 +6,91 @@ import ModalCuce from "@/components/modalCuce";
 import FormNewItem from "@/components/Form/newItem";
 import SicoesData from "@/components/sicoesData";
 import { usePostItemMutation, useGetItemsQuery, useDeleteItemMutation, useEditItemMutation, useGetItemsForUpdateQuery } from "@/redux/services/itemsApi";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 import { transformData, newItemObject, transformedItem } from "@/app/functions/utilities";
 import { useDispatch, useSelector } from "react-redux";
-import { nextPage, prevPage, firsPage, lastPage, searchCuce, anyPage, nextPageForUpdate, resetPageForUpdate, setPageForUpdate} from "@/redux/slice/paginationSlice";
-import DeleteIcon from '@mui/icons-material/Delete';
-import CachedIcon from '@mui/icons-material/Cached';
-import { toast } from 'react-toastify';
+import { nextPage, prevPage, firsPage, lastPage, searchCuce, anyPage, nextPageForUpdate, resetPageForUpdate, setPageForUpdate, setAuction} from "@/redux/slice/paginationSlice";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CachedIcon from "@mui/icons-material/Cached";
+import { toast } from "react-toastify";
 import Title from "@/components/common/title";
 import DescriptionContent from "@/components/common/description";
 import { handleRequest , processResponse, sendRequest} from "@/app/functions/puppeteerUtils";
-import UpdateIcon from '@mui/icons-material/Update';
+import UpdateIcon from "@mui/icons-material/Update";
 import Loading from "@/components/loading";
 const SicoesItems = () => {
     const headers = [
         {
-            accessorKey: 'cuce',
-            header: 'Cuce',
+            accessorKey: "cuce",
+            header: "Cuce",
             cell: ({ row }) => (<DescriptionContent>{row.original.cuce}</DescriptionContent>)
         },
         {
-            accessorKey: 'entity',
-            header: 'Entidad',
+            accessorKey: "entity",
+            header: "Entidad",
             cell: ({ row }) => (<DescriptionContent>{row.original.entity}</DescriptionContent>)
         },
         {
-            accessorKey: 'contractDescription',
-            header: 'Tipo Contratación', cell: ({ row }) => (<DescriptionContent>{row.original.contractDescription}</DescriptionContent>)
+            accessorKey: "contractDescription",
+            header: "Tipo Contratación", cell: ({ row }) => (<DescriptionContent>{row.original.contractDescription}</DescriptionContent>)
         },
         {
-            accessorKey: 'modality',
-            header: 'Modalidad',
+            accessorKey: "modality",
+            header: "Modalidad",
             cell: ({ row }) => (<DescriptionContent>{row.original.modality}</DescriptionContent>)
         },
         {
-            accessorKey: 'auction',
-            header: 'Subasta',
+            accessorKey: "auction",
+            header: "Subasta",
             meta: {
-                filterVariant: 'select',
+                filterVariant: "select",
             },
             cell: ({ row }) => (<DescriptionContent>{row.original.auction}</DescriptionContent>)
         },
         {
-            accessorKey: 'publishDateItem',
-            header: 'Fecha de Publicación',
+            accessorKey: "publishDateItem",
+            header: "Fecha de Publicación",
             cell: ({ row }) => (<DescriptionContent>{row.original.publishDateItem}</DescriptionContent>)
         },
         {
-            accessorKey: 'presentationDate',
-            header: 'Fecha de Presentación',
+            accessorKey: "presentationDate",
+            header: "Fecha de Presentación",
             cell: ({ row }) => (<DescriptionContent>{row.original.presentationDate}</DescriptionContent>)
         },
         {
-            accessorKey: 'form170Date',
-            header: '170 Fecha de Publicación',
+            accessorKey: "form170Date",
+            header: "170 Fecha de Publicación",
             cell : ({row}) => (<DescriptionContent>{row.original.form170Date}</DescriptionContent>)
         },
         {
-            accessorKey: 'stateAuction',
-            header: 'Estado',
+            accessorKey: "stateAuction",
+            header: "Estado",
             cell: ({ row }) => (<DescriptionContent>{row.original.stateAuction}</DescriptionContent>)
         },
         {
-            accessorKey: 'entregaForm170',
-            header: 'entrega formulario 170',
+            accessorKey: "entregaForm170",
+            header: "entrega formulario 170",
             cell: ({ row }) => {
                 return (<DescriptionContent>{row.original.presentationDate}</DescriptionContent>)
             }
         },
         {
-            accessorKey: 'refresh',
-            header: 'Refrescar',
+            accessorKey: "refresh",
+            header: "Refrescar",
             cell: ({ row }) => {
                 return (
                     <div className="flex items-center justify-center text-blue-800">
                         <button onClick={() => handlerefresh(row)} disabled={isRefreshing[row.original.id] ? true : false}>
-
                             <CachedIcon
-                                className={`${isRefreshing[row.original.id] ? 'animate-spin' : ''}`}
+                                className={`${isRefreshing[row.original.id] ? "animate-spin" : ""}`}
                             />
                         </button>
                     </div>)
             }
         },
         {
-            accessorKey: 'deleteRow',
-            header: 'Eliminar',
+            accessorKey: "deleteRow",
+            header: "Eliminar",
             cell: ({ row }) => (
                 //handleDeleteItems(row.original.id);
                 <button
@@ -105,22 +104,24 @@ const SicoesItems = () => {
     ];
 
     const sicoesDataFields = [
-        { label: 'CUCE', key: 'cuce' },
-        { label: 'Entidad', key: 'entity' },
-        { label: 'Tipo de Contrato', key: 'contract' },
-        { label: 'Modalidad', key: 'modality' },
-        { label: 'Descripción del Contrato', key: 'contractDescription' },
-        { label: 'Subasta', key: 'auction' },
-        { label: 'Estado de la Subasta', key: 'stateAuction' },
-        { label: 'Fecha de Presentación', key: 'presentationDate' },
-        { label: 'Fecha de Publicación', key: 'publishDateItem' },
-        { label: '170 Fecha de Publicación', key: 'form170Date' },
-        { label: 'Archivos', key: 'Archivos' },
-        { label: 'Formularios', key: 'Formularios' },
+        { label: "CUCE", key: "cuce" },
+        { label: "Entidad", key: "entity" },
+        { label: "Tipo de Contrato", key: "contract" },
+        { label: "Modalidad", key: "modality" },
+        { label: "Descripción del Contrato", key: "contractDescription" },
+        { label: "Subasta", key: "auction" },
+        { label: "Estado de la Subasta", key: "stateAuction" },
+        { label: "Fecha de Presentación", key: "presentationDate" },
+        { label: "Fecha de Publicación", key: "publishDateItem" },
+        { label: "170 Fecha de Publicación", key: "form170Date" },
+        { label: "Archivos", key: "Archivos" },
+        { label: "Formularios", key: "Formularios" },
     ];
 
     const dispatch = useDispatch();
     const page = useSelector(state => state.pagination.page);
+    const auction = useSelector(state => state.pagination.auction);
+    
     const pageForUpdateTalble = useSelector( state => state.pagination.pageForUpdateTalble);
     const search = useSelector(state => state.pagination.search);
     const [isLoading, setIsLoading] = useState(false);
@@ -144,6 +145,7 @@ const SicoesItems = () => {
     const { data: itemsSicoesData, refetch: refetchItems, isLoading: isloadingItemsSicoes } = useGetItemsQuery({
         page: page,
         search: search,
+        auction: auction,
         //limit
     });
 
@@ -219,19 +221,24 @@ const SicoesItems = () => {
         dispatch(anyPage(page));
         refetchItems();
     }
+
+    const handleAuction = (value) => {
+        dispatch(setAuction(value));
+        refetchItems();
+    }
    
     const handlerefresh = async (row) => {
             setIsRefreshing({ [row.original.id]: true });
-            handleRequest('refresh', { row }, {
+            handleRequest("refresh", { row }, {
                 onSuccess: (result) => {
                  // await editItem({ row.original.id, })
-                  toast.success('Item actualizado correctamente',{
+                  toast.success("Item actualizado correctamente",{
                     position: "bottom-right",
                 });
                   setIsRefreshing({ [row.original.id]: false });
                 },
                 onError: (error) => {
-                  toast.error('Error al actualizar el item',{
+                  toast.error("Error al actualizar el item",{
                     position: "bottom-right",
                 });
                   setIsRefreshing({ [row.original.id]: false });
@@ -241,17 +248,17 @@ const SicoesItems = () => {
 
     const handleSearchItem = async (values) => {
        setIsLoading(true);
-       handleRequest('search',{values},{
+       handleRequest("search",{values},{
         onSuccess: (result) => {
             if (result.data[0]){
                 setDataSicoes(result.data[0]);
                 setIsLoading(false);
-                toast.success('Item Encontrado correctamente',{
+                toast.success("Item Encontrado correctamente",{
                     position: "bottom-right",
                 });
             }else {
                 setIsLoading(false);
-                toast.error('Item No válido',{
+                toast.error("Item No válido",{
                     position: "bottom-right",
                 });  
             }
@@ -269,13 +276,13 @@ const SicoesItems = () => {
             refetchItems();
             setShowModal(false);
         } catch (error) {
-            console.error('Error al guardar el ítem:', error.message);
+            console.error("Error al guardar el ítem:", error.message);
         }
     }
 
     const handleModalClose = () => {
         setShowModal(false);
-        setDataSicoes('');
+        setDataSicoes("");
     }
     const handleModalDeleteClose = () => {
         setShowModalDelete(false);
@@ -285,6 +292,7 @@ const SicoesItems = () => {
         setSelectedItemToDelete(id);
         setShowModalDelete(true);
     }
+    
 
     const handleDeleteItems = async () => {
         try {
@@ -302,7 +310,7 @@ const SicoesItems = () => {
                 });
             }
         } catch (error) {
-            console.error('Error al eliminar el ítem:', error.message);
+            console.error("Error al eliminar el ítem:", error.message);
             toast.error("Error al eliminar el elemento", {
                 position: "bottom-right"
             });
@@ -372,6 +380,8 @@ const SicoesItems = () => {
                 handleAnyPage={handleAnyPage}
                 totalPages={itemsSicoesData?.totalPages || 0}
                 totalElements={itemsSicoesData?.totalElements || 0}
+                handleAuction={handleAuction}
+                currentFilter={auction}
                 page={page} />
         </div>
     );

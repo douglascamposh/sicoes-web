@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import Filter from './filterTable';
-import FirstPageSharpIcon from '@mui/icons-material/FirstPageSharp';
-import NavigateBeforeSharpIcon from '@mui/icons-material/NavigateBeforeSharp';
-import NavigateNextSharpIcon from '@mui/icons-material/NavigateNextSharp';
-import LastPageSharpIcon from '@mui/icons-material/LastPageSharp';
-import Title from './common/title';
-import DescriptionContent from './common/description';
-import { getRowStyle } from '@/app/functions/utilities';
+import React, { useState } from "react";
+import Filter from "./filterTable";
+import FirstPageSharpIcon from "@mui/icons-material/FirstPageSharp";
+import NavigateBeforeSharpIcon from "@mui/icons-material/NavigateBeforeSharp";
+import NavigateNextSharpIcon from "@mui/icons-material/NavigateNextSharp";
+import LastPageSharpIcon from "@mui/icons-material/LastPageSharp";
+import Title from "./common/title";
+import DescriptionContent from "./common/description";
+import { getRowStyle } from "@/app/functions/utilities";
 
 import {
   useReactTable,
@@ -15,11 +15,23 @@ import {
   getPaginationRowModel,
   flexRender,
   getFilteredRowModel
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 
-const Table = ({ data, columns, handleNextPage, handlePrevPage, handleFirstPage, handleLastPage, page, totalPages, totalElements, handleAnyPage }) => {
+const Table = ({ 
+  data, 
+  columns, 
+  handleNextPage, 
+  handlePrevPage, 
+  handleFirstPage,
+  handleLastPage, 
+  page, 
+  totalPages, 
+  totalElements, 
+  handleAnyPage,
+  handleAuction,
+  currentFilter,
+}) => {
 
-  const [columnFilters, setColumnFilters] = useState([]);
   const table = useReactTable({
     columns,
     data,
@@ -27,11 +39,7 @@ const Table = ({ data, columns, handleNextPage, handlePrevPage, handleFirstPage,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnFiltersChange: setColumnFilters,
-    state: {
-      columnFilters,
-    },
+    //getFilteredRowModel: getFilteredRowModel(),
   });
 
   return (
@@ -55,11 +63,15 @@ const Table = ({ data, columns, handleNextPage, handlePrevPage, handleFirstPage,
                     {header.isPlaceholder
                       ? null
                       : <Title>
-                        <h1 className='text-white'>{flexRender(header.column.columnDef.header, header.getContext())}</h1>
+                        <h1 className="text-white">{flexRender(header.column.columnDef.header, header.getContext())}</h1>
                       </Title>}
-                    {header.column.getCanFilter() && header.column.id === 'auction' ? (
+                    {header.column.getCanFilter() && header.column.id === "auction" ? (
                       <div>
-                        <Filter column={header.column} />
+                        <Filter 
+                          column={header.column}
+                          handleAuction={handleAuction}
+                          currentFilter={currentFilter}
+                        />
                       </div>
                     ) : null}
                   </th>
@@ -118,7 +130,7 @@ const Table = ({ data, columns, handleNextPage, handlePrevPage, handleFirstPage,
           </div>
           <div className="flex items-center gap-1 md:ml-3">
             <span className="text-gray-700 text-xs ml-1">
-              Página {page + 1} de{' '}
+              Página {page + 1} de{" "}
               {totalPages}
             </span>
             <span className="flex items-center gap-0.5 text-xs">
@@ -137,7 +149,7 @@ const Table = ({ data, columns, handleNextPage, handlePrevPage, handleFirstPage,
         </div>
         <div className="mt-4 flex flex-row justify-between">
           <span className="text-xs">
-            Mostrando {table.getRowModel().rows.length.toLocaleString()} de{' '}
+            Mostrando {table.getRowModel().rows.length.toLocaleString()} de{" "}
             {totalElements} filas
           </span>
           <span className="text-xs">
