@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
   const paginationSlice = createSlice({
-      name : 'pagination',
+      name : "pagination",
       initialState : {
         page: 0,
         pageForUpdateTalble: 0,
-        search : ''
+        search : "",
+        auction: null,
       },
       reducers : {
           firsPage : (state) => {
@@ -36,6 +37,9 @@ import { createSlice } from "@reduxjs/toolkit";
             if (action.payload === null) {
               state.pageForUpdateTalble = 0;
             }
+          },
+          setAuction : (state, action) => {
+            state.auction = action.payload;
           }
       }
   });
@@ -49,7 +53,8 @@ import { createSlice } from "@reduxjs/toolkit";
                 anyPage, 
                 nextPageForUpdate,
                 resetPageForUpdate,
-                setPageForUpdate
+                setPageForUpdate, 
+                setAuction,
                } = paginationSlice.actions;
   export default paginationSlice.reducer;
 
